@@ -13,6 +13,7 @@ build/
 .env
 .env.local
 .env.production
+.env.development
 
 # IDE files
 .vscode/
@@ -27,8 +28,9 @@ logs/
 *.log
 backend/logs/
 
-# Uploads
+# Uploads (PDFs - too large for git)
 backend/uploads/*
+frontend/assets/uploads/
 
 # Database
 *.db
@@ -44,10 +46,6 @@ tmp/
 temp/
 *.tmp
 
-# Coverage directory
-coverage/
-.nyc_output/
-
 # Package files
 package-lock.json
 yarn.lock
@@ -60,7 +58,7 @@ yarn.lock
 *.key
 *.cert
 
-# Large media files (optional - comment out if needed)
+# Large media files (videos - optional)
 *.mp4
 *.mov
 *.avi

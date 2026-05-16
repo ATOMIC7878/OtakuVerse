@@ -1,0 +1,9 @@
+# Auto detect text files
+* text=auto
+
+# Handle line endings
+*.js text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.json text eol=lf
+*.md text eol=lf
