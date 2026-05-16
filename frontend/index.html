@@ -1,0 +1,1159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <meta
+      name="description"
+      content="OtakuVerse - Where Knowledge Meets Infinity. Premium notes sharing platform for CS, DS, and IT domains."
+    />
+    <title>OtakuVerse | Where Knowledge Meets Infinity</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Google Fonts - Premium Typography -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Space Grotesk", "Inter", sans-serif;
+        overflow-x: hidden;
+        color: #ffffff;
+      }
+
+      /* Video Background - Full Screen */
+      .video-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -2;
+      }
+
+      #bg-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          rgba(0, 0, 0, 0.5) 0%,
+          rgba(0, 0, 0, 0.3) 50%,
+          rgba(0, 0, 0, 0.5) 100%
+        );
+        z-index: 1;
+      }
+
+      /* Particle Canvas for Three.js */
+      #particle-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* Content Wrapper */
+      .content-wrapper {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        width: 100%;
+      }
+
+      /* Transparent Glass Card */
+      .glass-card {
+        background: rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+        border-radius: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      .glass-card:hover {
+        border-color: rgba(255, 255, 255, 0.6);
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
+        transform: translateY(-5px);
+      }
+
+      /* Hero Section */
+      .hero-section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: clamp(80px, 12vw, 120px) 0; /* Proportional vertical alignment breathing spaces */
+        width: 100%;
+      }
+
+      .hero-content {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: clamp(30px, 6vw, 60px) clamp(20px, 8vw, 80px); /* Proportional internal boundary padding values */
+        text-align: center;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        width: 100%;
+      }
+
+      /* Logo Animation */
+      .logo-container {
+        margin-bottom: 30px;
+        width: 100%;
+      }
+
+      .otaku-logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
+        font-size: clamp(
+          2rem,
+          5vw,
+          3.5rem
+        ); /* Dynamic typography breakdown scaling */
+        font-weight: 900;
+        font-family: "Orbitron", monospace;
+        max-width: 100%;
+      }
+
+      .otaku-logo i {
+        font-size: clamp(2.5rem, 6vw, 4rem);
+        background: linear-gradient(135deg, #b84cff, #ff6b9d);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 20px rgba(184, 76, 255, 0.5);
+        animation: pulseGlow 2s ease-in-out infinite;
+        flex-shrink: 0;
+      }
+
+      .logo-text {
+        background: linear-gradient(135deg, #ffffff, #b84cff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        white-space: nowrap;
+      }
+
+      /* Hero Title */
+      .hero-title {
+        font-size: clamp(
+          1.8rem,
+          5.5vw,
+          4.5rem
+        ); /* Fluid header bounds sizing preventions */
+        font-weight: 800;
+        font-family: "Orbitron", monospace;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        width: 100%;
+      }
+
+      .hero-title .highlight {
+        background: linear-gradient(135deg, #00d4ff, #ff6b9d);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        position: relative;
+        display: inline-block;
+      }
+
+      /* FIXED: Hero Tagline Color - Silver to Violet Gradient */
+      .hero-subtitle {
+        font-size: clamp(0.95rem, 2vw, 1.3rem);
+        background: linear-gradient(90deg, #e0e0e0, #9d50bb);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 2rem;
+        font-weight: 400;
+        letter-spacing: 0.02em;
+        text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+        display: inline-block;
+        max-width: 100%;
+      }
+
+      /* Buttons */
+      .btn {
+        padding: 14px clamp(20px, 3.5vw, 35px); /* Responsive horizontal inner scale spaces */
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: clamp(0.85rem, 1.8vw, 1rem);
+        font-family: "Space Grotesk", sans-serif;
+        white-space: nowrap;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #00d4ff, #0099cc);
+        border: none;
+        box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        color: white;
+      }
+
+      .btn-primary {
+        box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 30px rgba(0, 212, 255, 0.6);
+      }
+
+      .btn-outline-light {
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+      }
+
+      .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: white;
+        transform: translateY(-3px) scale(1.05);
+      }
+
+      .hero-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap; /* Fixes button clipping on narrow viewports */
+        width: 100%;
+      }
+
+      /* Section Title - Enhanced Visibility */
+      .section-title {
+        font-size: clamp(
+          1.8rem,
+          4.5vw,
+          3rem
+        ); /* Adaptive sectional sub-headline metrics */
+        font-weight: 800;
+        font-family: "Orbitron", monospace;
+        background: linear-gradient(135deg, #ffffff, #ff6b9d, #b84cff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 3rem;
+        text-align: center;
+        text-shadow: 0 0 30px rgba(184, 76, 255, 0.3);
+        letter-spacing: 2px;
+        width: 100%;
+        padding: 0 15px;
+      }
+
+      .section-title i {
+        margin-right: 15px;
+        background: linear-gradient(135deg, #ff6b9d, #b84cff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-size: clamp(1.8rem, 4.5vw, 3rem);
+        text-shadow: 0 0 20px rgba(184, 76, 255, 0.5);
+      }
+
+      /* Domain Cards - Enhanced with Balanced Spacing */
+      .domain-card {
+        position: relative;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+        border-radius: 20px;
+        padding: 40px clamp(20px, 4vw, 30px); /* Proportional horizontal containment spaces */
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+
+      /* Card Shine Effect */
+      .domain-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        transition: left 0.6s ease;
+      }
+
+      .domain-card:hover::before {
+        left: 100%;
+      }
+
+      .domain-card:hover {
+        transform: translateY(-15px) scale(1.03);
+        border-color: rgba(255, 255, 255, 0.5);
+        background: rgba(0, 0, 0, 0.65);
+      }
+
+      /* CS Card - Cyberpunk Blue */
+      .cs-card {
+        border-top: 4px solid #00d4ff;
+      }
+
+      .cs-card:hover {
+        box-shadow: 0 0 40px rgba(0, 212, 255, 0.4);
+        border-top-color: #00d4ff;
+      }
+
+      /* DS Card - Neon Purple with Pink Hover */
+      .ds-card {
+        border-top: 4px solid #b84cff;
+      }
+
+      .ds-card:hover {
+        box-shadow:
+          0 0 50px rgba(184, 76, 255, 0.6),
+          0 0 30px rgba(255, 107, 157, 0.4);
+        border-top-color: #ff6b9d;
+        background: linear-gradient(
+          135deg,
+          rgba(184, 76, 255, 0.15),
+          rgba(255, 107, 157, 0.1)
+        );
+      }
+
+      /* IT Card - Matrix Green */
+      .it-card {
+        border-top: 4px solid #00ff88;
+      }
+
+      .it-card:hover {
+        box-shadow: 0 0 40px rgba(0, 255, 136, 0.4);
+        border-top-color: #00ff88;
+      }
+
+      /* Icon Styles - Enhanced & Consistent */
+      .card-icon {
+        font-size: clamp(
+          3rem,
+          6vw,
+          4rem
+        ); /* Proportional scaling icon perimeters */
+        margin-bottom: 20px;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        display: inline-block;
+        flex-shrink: 0;
+      }
+
+      .domain-card:hover .card-icon {
+        transform: scale(1.2) rotate(10deg);
+      }
+
+      .cs-card .card-icon {
+        color: #00d4ff;
+        text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+      }
+
+      .ds-card .card-icon {
+        color: #b84cff;
+        text-shadow: 0 0 20px rgba(184, 76, 255, 0.6);
+      }
+
+      .ds-card:hover .card-icon {
+        color: #ff6b9d;
+        text-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
+      }
+
+      .it-card .card-icon {
+        color: #00ff88;
+        text-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+      }
+
+      /* Domain Title - Enhanced Visibility */
+      .domain-title {
+        font-size: clamp(
+          1.3rem,
+          2.5vw,
+          1.8rem
+        ); /* Adaptive container headers sizing */
+        font-weight: 700;
+        margin-bottom: 12px;
+        font-family: "Orbitron", monospace;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .cs-card .domain-title {
+        color: #00d4ff;
+      }
+
+      .ds-card .domain-title {
+        color: #b84cff;
+      }
+
+      .ds-card:hover .domain-title {
+        color: #ff6b9d;
+        text-shadow: 0 0 15px rgba(255, 107, 157, 0.5);
+      }
+
+      .it-card .domain-title {
+        color: #00ff88;
+      }
+
+      /* Domain Tagline */
+      .domain-tagline {
+        font-size: clamp(0.9rem, 1.8vw, 1rem);
+        font-style: italic;
+        margin-bottom: 15px;
+        opacity: 0.95;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        color: rgba(255, 255, 255, 0.9);
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* Domain Description - Enhanced Visibility with Balanced Spacing */
+      .domain-description {
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.85);
+        margin-bottom: 20px;
+        line-height: 1.6;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        min-height: 80px;
+      }
+
+      /* Domain Stats - Aligned consistently */
+      .domain-stats {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+        padding: 12px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        gap: 5px;
+        flex-wrap: wrap; /* Handles small browser viewport breaking layout collisions */
+      }
+
+      .domain-stats span {
+        font-size: clamp(
+          0.75rem,
+          1.5vw,
+          0.9rem
+        ); /* Dynamic metric typography tracking */
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 500;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+      }
+
+      .cs-card:hover .domain-stats span {
+        color: #00d4ff;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+      }
+
+      .ds-card:hover .domain-stats span {
+        color: #ff6b9d;
+        text-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
+      }
+
+      .it-card:hover .domain-stats span {
+        color: #00ff88;
+        text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+      }
+
+      .domain-stats i {
+        margin-right: 8px;
+      }
+
+      /* Button Domain - Consistent spacing */
+      .btn-domain {
+        width: 100%;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-family: "Space Grotesk", sans-serif;
+        margin-top: auto;
+        white-space: nowrap;
+      }
+
+      .cs-card .btn-domain:hover {
+        background: #00d4ff;
+        border-color: #00d4ff;
+        transform: translateX(8px);
+        box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        color: #000;
+      }
+
+      .ds-card .btn-domain:hover {
+        background: linear-gradient(135deg, #b84cff, #ff6b9d);
+        border-color: #ff6b9d;
+        transform: translateX(8px);
+        box-shadow: 0 5px 25px rgba(184, 76, 255, 0.5);
+      }
+
+      .it-card .btn-domain:hover {
+        background: #00ff88;
+        border-color: #00ff88;
+        transform: translateX(8px);
+        box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+        color: #000;
+      }
+
+      /* Features Section - Enhanced Cards */
+      .features-section {
+        padding: clamp(40px, 8vw, 80px) 0;
+        width: 100%;
+      }
+
+      .feature-card {
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+        border-radius: 20px;
+        padding: 30px clamp(15px, 3vw, 25px);
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        height: 100%;
+        width: 100%;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-10px) scale(1.05);
+        background: rgba(0, 0, 0, 0.65);
+        border-color: rgba(255, 107, 157, 0.5);
+        box-shadow: 0 10px 30px rgba(255, 107, 157, 0.25);
+      }
+
+      .feature-card i {
+        font-size: clamp(2.2rem, 5vw, 2.8rem);
+        margin-bottom: 18px;
+        transition: all 0.3s ease;
+        display: inline-block;
+      }
+
+      /* Individual feature card icons with distinct colors */
+      .feature-card:nth-child(1) i {
+        background: linear-gradient(135deg, #00d4ff, #0099cc);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .feature-card:nth-child(2) i {
+        background: linear-gradient(135deg, #b84cff, #ff6b9d);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .feature-card:nth-child(3) i {
+        background: linear-gradient(135deg, #00ff88, #00cc66);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .feature-card:hover i {
+        transform: scale(1.15);
+        text-shadow: 0 0 20px rgba(255, 107, 157, 0.4);
+      }
+
+      .feature-card h4 {
+        font-size: clamp(1.1rem, 2vw, 1.25rem);
+        font-weight: 600;
+        margin-bottom: 12px;
+        font-family: "Orbitron", monospace;
+        color: rgba(255, 255, 255, 0.95);
+      }
+
+      .feature-card p {
+        color: rgba(255, 255, 255, 0.8);
+        margin: 0;
+        line-height: 1.5;
+        font-size: 0.9rem;
+      }
+
+      /* Animations */
+      @keyframes pulseGlow {
+        0%,
+        100% {
+          text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+        50% {
+          text-shadow: 0 0 40px rgba(0, 212, 255, 0.8);
+        }
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      @keyframes ripple {
+        0% {
+          transform: scale(0);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(50);
+          opacity: 0;
+        }
+      }
+
+      /* Grid Layout - Better Card Alignment */
+      .domains-section .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+      }
+
+      .domains-section [class*="col-"] {
+        display: flex;
+        margin-bottom: 30px;
+      }
+
+      /* Precise Breakdown Layout Device Media Injections */
+      @media (max-width: 1200px) {
+        .hero-title {
+          font-size: 3.5rem;
+        }
+      }
+
+      @media (max-width: 992px) {
+        .hero-title {
+          font-size: 2.8rem;
+        }
+        .hero-content {
+          padding: 40px 50px;
+          margin: 0 15px; /* Aligned safely inside container row elements */
+        }
+        .section-title {
+          font-size: 2.5rem;
+        }
+        .domain-card {
+          transform: none !important; /* Prevents text focus blurring on handheld displays */
+        }
+        .domain-card:hover {
+          transform: translateY(-8px) scale(1.01) !important;
+        }
+        .feature-card:hover {
+          transform: translateY(-6px) scale(1.02) !important;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .hero-title {
+          font-size: 2rem;
+        }
+        .hero-subtitle {
+          font-size: 1rem;
+        }
+        .hero-content {
+          padding: 30px 20px;
+          margin: 0;
+        }
+        .section-title {
+          font-size: 2rem;
+        }
+        .domain-title {
+          font-size: 1.4rem;
+        }
+        .domain-card {
+          padding: 25px 20px;
+        }
+        .domain-title,
+        .domain-tagline {
+          white-space: normal; /* Permits structured wrap generation on small portrait canvas configurations */
+          text-overflow: clip;
+          overflow: visible;
+        }
+        .domain-stats {
+          flex-direction: column;
+          gap: 10px;
+          text-align: center;
+          align-items: center;
+        }
+        .hero-buttons {
+          flex-direction: column;
+          gap: 15px;
+          align-items: center;
+        }
+        .hero-buttons .btn {
+          width: 100%;
+          max-width: 320px;
+          margin: 0 !important;
+        }
+        .feature-card {
+          padding: 25px 20px;
+        }
+        .feature-card i {
+          font-size: 2.2rem;
+        }
+        .feature-card h4 {
+          font-size: 1.1rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .hero-title {
+          font-size: 1.5rem;
+        }
+        .otaku-logo {
+          font-size: 2rem;
+        }
+        .otaku-logo i {
+          font-size: 2.5rem;
+        }
+        .section-title {
+          font-size: 1.6rem;
+        }
+        .domain-description {
+          min-height: auto;
+        }
+      }
+
+      /* Ultra-wide Displays Constraint Guard */
+      @media (min-width: 1800px) {
+        .container {
+          max-width: 1400px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Video Background -->
+    <div class="video-container">
+      <video autoplay muted loop playsinline preload="metadata" id="bg-video">
+        <source src="assets/videos/main-bg.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay"></div>
+    </div>
+
+    <!-- Particle Canvas for Three.js -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="container">
+          <div class="hero-content glass-card">
+            <div class="logo-container">
+              <div class="otaku-logo">
+                <i class="fas fa-infinity"></i>
+                <span class="logo-text">OtakuVerse</span>
+              </div>
+            </div>
+
+            <h1 class="hero-title">
+              Where Knowledge <span class="highlight">Meets Infinity</span>
+            </h1>
+
+            <p class="hero-subtitle">
+              Immerse yourself in a futuristic learning experience with
+              cutting-edge resources
+            </p>
+
+            <div class="hero-buttons mt-4">
+              <a
+                href="pages/auth/select-role.html"
+                class="btn btn-primary btn-lg"
+              >
+                <i class="fas fa-rocket"></i> Get Started
+              </a>
+              <a href="#domains" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-compass"></i> Explore Domains
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Domains Section -->
+      <section id="domains" class="domains-section py-5">
+        <div class="container">
+          <h2 class="section-title">
+            <i class="fas fa-cube"></i> Choose Your Path
+          </h2>
+
+          <div class="row g-4">
+            <!-- CS Domain -->
+            <div class="col-12 col-md-6 col-lg-4">
+              <div
+                class="domain-card cs-card"
+                onclick="window.location.href = 'pages/auth/select-role.html'"
+              >
+                <div class="card-icon">
+                  <i class="fas fa-laptop-code"></i>
+                </div>
+                <h3 class="domain-title">Computer Science</h3>
+                <p class="domain-tagline">"Code Beyond Limits"</p>
+                <p class="domain-description">
+                  Master algorithms, data structures, system design, and
+                  cutting-edge programming paradigms. From fundamentals to
+                  advanced concepts.
+                </p>
+                <div class="domain-stats">
+                  <span><i class="fas fa-file-alt"></i> 150+ Notes</span>
+                  <span><i class="fas fa-download"></i> 5.2k+ Downloads</span>
+                  <span><i class="fas fa-users"></i> 2.3k+ Learners</span>
+                </div>
+                <button class="btn-domain">
+                  Enter Domain <i class="fas fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- DS Domain -->
+            <div class="col-12 col-md-6 col-lg-4">
+              <div
+                class="domain-card ds-card"
+                onclick="window.location.href = 'pages/auth/select-role.html'"
+              >
+                <div class="card-icon">
+                  <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="domain-title">Data Science</h3>
+                <p class="domain-tagline">"Decode the Future"</p>
+                <p class="domain-description">
+                  Explore machine learning, AI, deep learning, big data
+                  analytics, and unlock powerful insights from complex datasets.
+                  Master predictive modeling and neural networks.
+                </p>
+                <div class="domain-stats">
+                  <span><i class="fas fa-file-alt"></i> 120+ Notes</span>
+                  <span><i class="fas fa-download"></i> 4.8k+ Downloads</span>
+                  <span><i class="fas fa-users"></i> 1.9k+ Learners</span>
+                </div>
+                <button class="btn-domain">
+                  Enter Domain <i class="fas fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- IT Domain -->
+            <div class="col-12 col-md-6 col-lg-4">
+              <div
+                class="domain-card it-card"
+                onclick="window.location.href = 'pages/auth/select-role.html'"
+              >
+                <div class="card-icon">
+                  <i class="fas fa-server"></i>
+                </div>
+                <h3 class="domain-title">Information Technology</h3>
+                <p class="domain-tagline">"Build the Digital World"</p>
+                <p class="domain-description">
+                  Learn cloud computing, cybersecurity, DevOps, network
+                  infrastructure, and modern IT management. Build scalable and
+                  secure digital solutions.
+                </p>
+                <div class="domain-stats">
+                  <span><i class="fas fa-file-alt"></i> 100+ Notes</span>
+                  <span><i class="fas fa-download"></i> 3.8k+ Downloads</span>
+                  <span><i class="fas fa-users"></i> 1.5k+ Learners</span>
+                </div>
+                <button class="btn-domain">
+                  Enter Domain <i class="fas fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <section class="features-section">
+        <div class="container">
+          <div class="row g-4">
+            <div class="col-12 col-md-4">
+              <div class="feature-card">
+                <i class="fas fa-star-of-life"></i>
+                <h4>Premium Resources</h4>
+                <p>
+                  Curated high-quality study materials from industry experts
+                  with detailed explanations and examples
+                </p>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="feature-card">
+                <i class="fas fa-bolt"></i>
+                <h4>Instant Access</h4>
+                <p>
+                  Download and preview notes instantly with one click. No
+                  waiting time, start learning immediately
+                </p>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="feature-card">
+                <i class="fas fa-chart-line"></i>
+                <h4>Regular Updates</h4>
+                <p>
+                  Fresh content added weekly to keep you ahead. Stay updated
+                  with the latest industry trends
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Video background fallback
+      const video = document.getElementById("bg-video");
+      if (video) {
+        video.play().catch((e) => {
+          console.log("Video autoplay failed:", e);
+          document.querySelector(".video-overlay").style.background =
+            "linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9))";
+        });
+      }
+
+      // Three.js Particle System
+      const canvas = document.getElementById("particle-canvas");
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000,
+      );
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+
+      const particleCount = 800;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 2000;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 1000;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 500;
+
+        const colorChoice = Math.random();
+        if (colorChoice < 0.5) {
+          colors[i * 3] = 0.72;
+          colors[i * 3 + 1] = 0.3;
+          colors[i * 3 + 2] = 1.0;
+        } else {
+          colors[i * 3] = 1.0;
+          colors[i * 3 + 1] = 0.42;
+          colors[i * 3 + 2] = 0.62;
+        }
+      }
+
+      geometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(positions, 3),
+      );
+      geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+      const particleMaterial = new THREE.PointsMaterial({
+        size: 0.8,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.4,
+        blending: THREE.AdditiveBlending,
+      });
+
+      const particles = new THREE.Points(geometry, particleMaterial);
+      scene.add(particles);
+
+      camera.position.z = 500;
+
+      let mouseX = 0;
+      let mouseY = 0;
+
+      document.addEventListener("mousemove", (event) => {
+        mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+      });
+
+      function animateParticles() {
+        requestAnimationFrame(animateParticles);
+
+        particles.rotation.y += 0.0005;
+        particles.rotation.x += 0.0003;
+
+        particles.rotation.x += mouseY * 0.0005;
+        particles.rotation.y += mouseX * 0.0005;
+
+        renderer.render(scene, camera);
+      }
+
+      animateParticles();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      if (typeof anime !== "undefined") {
+        anime({
+          targets: ".domain-card",
+          translateY: [50, 0],
+          opacity: [0, 1],
+          duration: 800,
+          delay: anime.stagger(120),
+          easing: "easeOutElastic(1, .6)",
+        });
+
+        anime({
+          targets: ".hero-title, .hero-subtitle, .hero-buttons",
+          opacity: [0, 1],
+          translateY: [30, 0],
+          duration: 1000,
+          delay: anime.stagger(200),
+          easing: "easeOutCubic",
+        });
+
+        anime({
+          targets: ".feature-card",
+          scale: [0.8, 1],
+          opacity: [0, 1],
+          duration: 600,
+          delay: anime.stagger(150),
+          easing: "easeOutBack",
+        });
+      }
+
+      document.querySelectorAll(".domain-card").forEach((card) => {
+        card.addEventListener("mouseenter", (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          for (let i = 0; i < 8; i++) {
+            const particle = document.createElement("div");
+            const size = Math.random() * 8 + 4;
+            const isDSCard = card.classList.contains("ds-card");
+            particle.style.cssText = `
+                        position: absolute;
+                        width: ${size}px;
+                        height: ${size}px;
+                        background: radial-gradient(circle, ${isDSCard ? "#b84cff" : card.classList.contains("cs-card") ? "#00d4ff" : "#00ff88"}, ${isDSCard ? "#ff6b9d" : "transparent"});
+                        border-radius: 50%;
+                        left: ${x + (Math.random() - 0.5) * 40}px;
+                        top: ${y + (Math.random() - 0.5) * 40}px;
+                        pointer-events: none;
+                        opacity: 0.8;
+                        animation: ripple ${Math.random() * 0.5 + 0.8}s ease-out forwards;
+                    `;
+            card.style.position = "relative";
+            card.style.overflow = "hidden";
+            card.appendChild(particle);
+            setTimeout(() => particle.remove(), 1000);
+          }
+        });
+      });
+
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+      });
+
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.style.animation = "float 3s ease-in-out infinite";
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll(".card-icon").forEach((icon) => {
+        observer.observe(icon);
+      });
+    </script>
+    <script src="/js/title-manager.js"></script>
+  </body>
+</html>

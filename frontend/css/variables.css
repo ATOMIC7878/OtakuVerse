@@ -1,0 +1,70 @@
+:root {
+  /* Color Schemes */
+  --primary-color: #6c63ff;
+  --secondary-color: #ff6584;
+  --success-color: #05df8b;
+  --warning-color: #ffb347;
+  --danger-color: #ff4757;
+  --dark-bg: #0a0a2a;
+  --darker-bg: #05051a;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+
+  /* CS Theme */
+  --cs-primary: #00d4ff;
+  --cs-glow: 0 0 20px rgba(0, 212, 255, 0.3);
+
+  /* DS Theme */
+  --ds-primary: #b84cff;
+  --ds-glow: 0 0 20px rgba(184, 76, 255, 0.3);
+
+  /* IT Theme */
+  --it-primary: #00ff88;
+  --it-glow: 0 0 20px rgba(0, 255, 136, 0.3);
+
+  /* Typography */
+  --font-primary:
+    "Segoe UI", "Poppins", "Inter", system-ui, -apple-system, sans-serif;
+  --font-heading: "Poppins", "Segoe UI", sans-serif;
+  --font-mono: "Fira Code", monospace;
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  --spacing-xxl: 5rem;
+
+  /* Animations */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* Z-index layers */
+  --z-video: -2;
+  --z-overlay: -1;
+  --z-background: 0;
+  --z-content: 1;
+  --z-navbar: 100;
+  --z-modal: 1000;
+  --z-tooltip: 1100;
+}
+
+/* Dark Mode Variables */
+[data-theme="dark"] {
+  --bg-primary: #0a0a2a;
+  --bg-secondary: #0f0f3a;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0d0;
+  --text-muted: #7070a0;
+}
+
+/* Light Mode Variables */
+[data-theme="light"] {
+  --bg-primary: #f5f5ff;
+  --bg-secondary: #ffffff;
+  --text-primary: #1a1a2e;
+  --text-secondary: #2d2d5e;
+  --text-muted: #6c6c8a;
+}

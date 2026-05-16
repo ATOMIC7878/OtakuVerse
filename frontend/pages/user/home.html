@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>OtakuVerse | Premium Cinematic Dashboard</title>
+
+    <!-- UI Core -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Engines -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+      :root {
+        --primary-neon: #b84cff;
+        --secondary-neon: #ff6b9d;
+        --glass-bg: rgba(7, 7, 20, 0.45);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --nav-glass: rgba(0, 0, 0, 0.6);
+        --primary-glow: rgba(184, 76, 255, 0.3);
+        --tagline-silver: #e0e0e0;
+        --tagline-violet: #9d50bb;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Space Grotesk", sans-serif;
+        background: #02020a;
+        color: #ffffff;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      /* --- Cinematic Environment --- */
+      .video-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -3;
+      }
+      #bg-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: brightness(0.4) saturate(1.3);
+      }
+      .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          circle at 50% 50%,
+          transparent 10%,
+          rgba(2, 2, 12, 0.85) 100%
+        );
+        z-index: -1;
+      }
+      #three-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -2;
+        pointer-events: none;
+      }
+
+      /* --- SYNCHRONIZED HUD NAVBAR SECTION --- */
+      .navbar {
+        background: var(--nav-glass);
+        backdrop-filter: blur(25px) saturate(160%);
+        -webkit-backdrop-filter: blur(25px) saturate(160%);
+        border-bottom: 1px solid rgba(184, 76, 255, 0.2);
+        padding: 0.8rem 0;
+        z-index: 1000;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .brand-group {
+        display: flex;
+        flex-direction: column;
+        padding-left: 5px;
+        min-width: 0;
+      }
+
+      /* Synchronized Navbar Brand & Hover Fix */
+      .navbar-brand,
+      .navbar-brand:hover,
+      .navbar-brand:focus,
+      .navbar-brand:active {
+        font-family: "Orbitron", sans-serif;
+        font-weight: 900;
+        font-size: clamp(
+          1.1rem,
+          2.5vw,
+          1.4rem
+        ); /* Responsive typography boundary configuration */
+        background: linear-gradient(
+          135deg,
+          var(--primary-neon),
+          var(--secondary-neon)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent !important;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: 2px;
+        line-height: 1;
+        transition: opacity 0.3s ease;
+        white-space: nowrap;
+      }
+
+      .navbar-brand:hover {
+        opacity: 0.85;
+        filter: drop-shadow(0 0 8px var(--primary-glow));
+      }
+
+      .navbar-brand i {
+        color: var(--primary-neon);
+        -webkit-text-fill-color: initial;
+        background: linear-gradient(
+          135deg,
+          var(--primary-neon),
+          var(--secondary-neon)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+      }
+
+      /* Synchronized Tagline Color Combination */
+      .navbar-tagline {
+        font-family: "Orbitron", sans-serif;
+        font-size: clamp(
+          0.45rem,
+          1.2vw,
+          0.55rem
+        ); /* Dynamic text optimization framework tracking rules */
+        letter-spacing: clamp(1.5px, 0.8vw, 3.5px);
+        background: linear-gradient(
+          90deg,
+          var(--tagline-silver),
+          var(--tagline-violet)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-top: 5px;
+        filter: drop-shadow(0 0 5px rgba(157, 80, 187, 0.4));
+        white-space: nowrap;
+      }
+
+      /* Premium Tech Logout - Preserved Structure */
+      .logout-tech-container {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        padding: 4px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        flex-shrink: 0;
+      }
+
+      .logout-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: transparent;
+        border: none;
+        color: var(--secondary-neon);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+      }
+
+      .logout-tech-container:hover {
+        border-color: var(--primary-neon);
+        background: rgba(255, 0, 122, 0.15);
+        transform: scale(1.05) translateY(-2px);
+      }
+
+      /* --- 2. HERO SECTION --- */
+      .hero-title {
+        font-family: "Orbitron", sans-serif;
+        font-weight: 900;
+        background: linear-gradient(
+          90deg,
+          #fff,
+          var(--primary-neon),
+          var(--secondary-neon),
+          #fff
+        );
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: shine 8s linear infinite;
+        font-size: clamp(2rem, 5.5vw, 4.5rem);
+        letter-spacing: -1px;
+      }
+
+      /* --- 3. HOLOFOIL DOMAIN CARDS --- */
+      .domain-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 28px;
+        padding: clamp(35px, 5vw, 55px) clamp(20px, 4vw, 35px); /* Adaptive interior spacing padding metrics */
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(28px) brightness(1.1);
+        -webkit-backdrop-filter: blur(28px) brightness(1.1);
+        transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        transform-style: preserve-3d;
+        height: 100%;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+      }
+
+      .domain-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.05) 45%,
+          rgba(255, 255, 255, 0.25) 50%,
+          rgba(255, 255, 255, 0.05) 55%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        background-size: 250% 250%;
+        background-position: var(--pos-x, 50%) var(--pos-y, 50%);
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .card-border-trace {
+        position: absolute;
+        inset: 0;
+        border: 2px solid transparent;
+        border-radius: 28px;
+        background: linear-gradient(
+            var(--angle, 0deg),
+            var(--primary-neon),
+            var(--secondary-neon),
+            transparent
+          )
+          border-box;
+        -webkit-mask:
+          linear-gradient(#fff 0 0) padding-box,
+          linear-gradient(#fff 0 0);
+        -webkit-mask-composite: destination-out;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.5s;
+      }
+
+      .domain-card:hover {
+        background: rgba(12, 12, 35, 0.6);
+        border-color: rgba(255, 255, 255, 0.25);
+        transform: translateY(-15px) scale(1.02);
+        box-shadow:
+          0 30px 60px rgba(0, 0, 0, 0.7),
+          0 0 25px rgba(255, 0, 122, 0.15);
+      }
+
+      .domain-card:hover .card-border-trace {
+        opacity: 1;
+        --angle: 360deg;
+      }
+
+      .card-accent-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: clamp(
+          3rem,
+          8vw,
+          5rem
+        ); /* Scalable character title background layout typography */
+        font-weight: 900;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.18) 0%,
+          transparent 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        line-height: 0.8;
+        margin-bottom: -10px;
+        transition: 0.5s;
+      }
+
+      .card-secondary-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: clamp(0.9rem, 2vw, 1rem);
+        font-weight: 700;
+        letter-spacing: 3px;
+        color: #fff;
+        margin-bottom: 1.2rem;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      }
+
+      .card-glow-spot {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          circle at var(--x, 50%) var(--y, 50%),
+          rgba(188, 19, 254, 0.25) 0%,
+          transparent 60%
+        );
+        pointer-events: none;
+      }
+
+      .btn-init {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: white;
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+        padding: 14px;
+        border-radius: 50px;
+        transition: 0.4s;
+        z-index: 10;
+        position: relative;
+      }
+      .btn-init:hover {
+        background: var(--primary-neon);
+        box-shadow: 0 0 25px var(--primary-neon);
+        color: white;
+        border-color: transparent;
+        transform: translateY(-2px);
+      }
+
+      /* --- Adaptive Breakpoint Matrices --- */
+      @media (max-width: 991px) {
+        .domain-card {
+          transform: none !important; /* Disables 3D tilt tracking constraints on medium touches */
+        }
+        .domain-card:hover {
+          transform: translateY(-8px) scale(1.01) !important;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .navbar-tagline {
+          display: none;
+        }
+        .container {
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+        main {
+          padding-top: 1.5rem !important;
+          padding-bottom: 2rem !important;
+        }
+        section.py-5 {
+          padding-top: 1rem !important;
+          padding-bottom: 1rem !important;
+          margin-bottom: 1.5rem !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .navbar {
+          padding: 0.6rem 0;
+        }
+        .brand-group {
+          padding-left: 2px;
+        }
+        .domain-card {
+          padding: 35px 20px;
+        }
+      }
+
+      /* Ultra-wide Resolution Grid Safeguard */
+      @media (min-width: 1800px) {
+        .container {
+          max-width: 1320px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="three-canvas"></canvas>
+
+    <div class="video-container">
+      <video autoplay muted loop playsinline id="bg-video">
+        <source src="../../assets/videos/Castle.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay"></div>
+    </div>
+
+    <div class="content-wrapper">
+      <nav class="navbar sticky-top">
+        <div
+          class="container d-flex justify-content-between align-items-center"
+        >
+          <div class="brand-group">
+            <a class="navbar-brand" href="#">
+              <i class="fas fa-infinity me-2"></i>OTAKUVERSE
+            </a>
+            <span class="navbar-tagline">Where Knowledge Meets Infinity</span>
+          </div>
+
+          <div class="d-flex align-items-center gap-3">
+            <span
+              id="userDisplay"
+              class="d-none d-lg-block"
+              style="
+                font-family: &quot;Orbitron&quot;;
+                font-size: 0.7rem;
+                letter-spacing: 2px;
+                opacity: 0.6;
+              "
+              >SYSTEM_ONLINE</span
+            >
+            <div
+              class="logout-tech-container"
+              id="logoutBtn"
+              title="Terminate Session"
+            >
+              <button class="logout-btn">
+                <i class="fas fa-power-off"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <main class="container py-5">
+        <section class="row mb-5 py-5 text-center">
+          <div class="col-12">
+            <p
+              style="
+                font-family: &quot;Orbitron&quot;;
+                font-size: 0.8rem;
+                letter-spacing: 10px;
+                color: var(--primary-neon);
+                text-shadow: 0 0 10px var(--primary-neon);
+              "
+            >
+              ACCESS AUTHORIZED
+            </p>
+            <h1 class="hero-title mb-4" id="welcomeMessage">WELCOME BACK</h1>
+            <div
+              class="mx-auto"
+              style="
+                width: 120px;
+                height: 1px;
+                background: linear-gradient(
+                  90deg,
+                  transparent,
+                  var(--primary-neon),
+                  transparent
+                );
+              "
+            ></div>
+          </div>
+        </section>
+
+        <div class="row g-4 justify-content-center">
+          <!-- Domain: CS -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div
+              class="domain-card"
+              onclick="location.href = 'domain/cs/semester-selection.html'"
+            >
+              <div class="card-border-trace"></div>
+              <div class="card-glow-spot"></div>
+              <div class="text-center position-relative" style="z-index: 5">
+                <h2 class="card-accent-title">CS</h2>
+                <h3
+                  class="card-secondary-title"
+                  style="color: var(--primary-neon)"
+                >
+                  COMPUTER SCIENCE
+                </h3>
+                <p class="small opacity-75 mb-4">
+                  Master algorithms, system design, and the architecture of the
+                  digital void.
+                </p>
+                <button class="btn btn-init w-100">
+                  INITIALIZE DOMAIN <i class="fas fa-chevron-right ms-2"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Domain: DS -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div
+              class="domain-card"
+              onclick="location.href = 'domain/ds/semester-selection.html'"
+            >
+              <div class="card-border-trace"></div>
+              <div class="card-glow-spot"></div>
+              <div class="text-center position-relative" style="z-index: 5">
+                <h2 class="card-accent-title">DS</h2>
+                <h3
+                  class="card-secondary-title"
+                  style="color: var(--secondary-neon)"
+                >
+                  DATA SCIENCE
+                </h3>
+                <p class="small opacity-75 mb-4">
+                  Decrypt neural patterns and process intelligence from massive
+                  data streams.
+                </p>
+                <button class="btn btn-init w-100">
+                  INITIALIZE DOMAIN <i class="fas fa-chevron-right ms-2"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Domain: IT -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div
+              class="domain-card"
+              onclick="location.href = 'domain/it/semester-selection.html'"
+            >
+              <div class="card-border-trace"></div>
+              <div class="card-glow-spot"></div>
+              <div class="text-center position-relative" style="z-index: 5">
+                <h2 class="card-accent-title">IT</h2>
+                <h3 class="card-secondary-title" style="color: #00f2ff">
+                  INFO TECHNOLOGY
+                </h3>
+                <p class="small opacity-75 mb-4">
+                  Secure the grid, manage cloud clusters, and maintain
+                  networking nodes.
+                </p>
+                <button class="btn btn-init w-100">
+                  INITIALIZE DOMAIN <i class="fas fa-chevron-right ms-2"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000,
+      );
+      const renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById("three-canvas"),
+        alpha: true,
+        antialias: true,
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      const posArray = new Float32Array(1600 * 3);
+      for (let i = 0; i < 4800; i++) posArray[i] = (Math.random() - 0.5) * 10;
+      const particlesGeometry = new THREE.BufferGeometry();
+      particlesGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(posArray, 3),
+      );
+
+      const material = new THREE.PointsMaterial({
+        size: 0.005,
+        color: 0xbc13fe,
+        transparent: true,
+        opacity: 0.4,
+        blending: THREE.AdditiveBlending,
+      });
+      const particlesMesh = new THREE.Points(particlesGeometry, material);
+      scene.add(particlesMesh);
+      camera.position.z = 2.5;
+
+      function animateParticles() {
+        requestAnimationFrame(animateParticles);
+        particlesMesh.rotation.y += 0.0007;
+        particlesMesh.rotation.x += 0.0004;
+        renderer.render(scene, camera);
+      }
+      animateParticles();
+
+      //const userEmail = localStorage.getItem("userEmail") || "ASPIRANT";
+      document.getElementById("welcomeMessage").innerText = `WELCOME, ASPIRANT`;
+
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        anime({
+          targets: ".content-wrapper",
+          opacity: 0,
+          scale: 0.95,
+          duration: 800,
+          easing: "easeInOutQuad",
+          complete: () => {
+            localStorage.clear();
+            window.location.href = "/pages/auth/select-role.html";
+          },
+        });
+      });
+
+      // Unified touch vs mouse handling for tilt logic calculation
+      const handleTilt = (card, clientX, clientY) => {
+        const rect = card.getBoundingClientRect();
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+        card.style.setProperty(
+          "--pos-x",
+          `${Math.round((x / rect.width) * 100)}%`,
+        );
+        card.style.setProperty(
+          "--pos-y",
+          `${Math.round((y / rect.height) * 100)}%`,
+        );
+        card.style.setProperty("--x", `${x}px`);
+        card.style.setProperty("--y", `${y}px`);
+
+        if (window.innerWidth > 991) {
+          card.style.transform = `perspective(1200px) rotateX(${(y - rect.height / 2) / 18}deg) rotateY(${(rect.width / 2 - x) / 18}deg) translateY(-12px)`;
+        }
+      };
+
+      document.querySelectorAll(".domain-card").forEach((card) => {
+        card.addEventListener("mousemove", (e) =>
+          handleTilt(card, e.clientX, e.clientY),
+        );
+
+        card.addEventListener(
+          "touchmove",
+          (e) => {
+            if (e.touches.length > 0) {
+              handleTilt(card, e.touches[0].clientX, e.touches[0].clientY);
+            }
+          },
+          { passive: true },
+        );
+
+        card.addEventListener("mouseleave", () => {
+          card.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0)`;
+        });
+        card.addEventListener("touchend", () => {
+          card.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0)`;
+        });
+      });
+
+      // Refactored stagger configurations to scale naturally across flexible displays layout sizes
+      anime({
+        targets: ".domain-card",
+        scale: [0.92, 1],
+        opacity: [0, 1],
+        translateY: [60, 0],
+        delay: anime.stagger(150),
+        duration: 1200,
+        easing: "easeOutElastic(1, .8)",
+      });
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+    <script src="/js/title-manager.js"></script>
+  </body>
+</html>

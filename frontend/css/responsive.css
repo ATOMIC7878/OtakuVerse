@@ -1,0 +1,278 @@
+/* Responsive Design System */
+
+/* Large Desktop (1200px and above) */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+
+  .hero-title {
+    font-size: 4rem;
+  }
+}
+
+/* Desktop (992px to 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .hero-title {
+    font-size: 3rem;
+  }
+
+  .domain-card {
+    padding: 25px;
+  }
+}
+
+/* Tablet (768px to 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .hero-content {
+    padding: 40px;
+    margin: 0 30px;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .domain-card {
+    margin-bottom: 20px;
+  }
+
+  .glass-card {
+    margin: 20px;
+  }
+}
+
+/* Mobile Landscape (576px to 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .hero-content {
+    padding: 30px;
+    margin: 0 20px;
+  }
+
+  .section-title {
+    font-size: 1.8rem;
+  }
+
+  .domain-card {
+    margin-bottom: 20px;
+  }
+
+  .domain-stats {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .role-card {
+    margin-bottom: 20px;
+  }
+}
+
+/* Mobile Portrait (up to 575px) */
+@media (max-width: 575px) {
+  body {
+    font-size: 14px;
+  }
+
+  .hero-title {
+    font-size: 1.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .hero-content {
+    padding: 20px;
+    margin: 0 15px;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .domain-card {
+    padding: 20px;
+    margin-bottom: 15px;
+  }
+
+  .domain-title {
+    font-size: 1.2rem;
+  }
+
+  .domain-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+
+  .glass-card {
+    border-radius: 15px;
+    padding: 20px;
+  }
+
+  .role-card {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .auth-container {
+    padding: 20px;
+    margin: 15px;
+  }
+
+  .feature-card {
+    margin-bottom: 15px;
+  }
+
+  .hero-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .hero-buttons .btn {
+    width: 100%;
+    margin: 0 !important;
+  }
+
+  /* Adjust video overlay for mobile */
+  .video-overlay {
+    background: rgba(10, 10, 42, 0.9);
+  }
+}
+
+/* Ultra Wide Displays (1600px and above) */
+@media (min-width: 1600px) {
+  .container {
+    max-width: 1400px;
+  }
+
+  .hero-title {
+    font-size: 4.5rem;
+  }
+
+  .hero-content {
+    max-width: 1000px;
+  }
+
+  .domain-card {
+    padding: 35px;
+  }
+}
+
+/* Fix for very small devices (up to 320px) */
+@media (max-width: 320px) {
+  .hero-title {
+    font-size: 1.2rem;
+  }
+
+  .hero-content {
+    padding: 15px;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+  }
+
+  .domain-title {
+    font-size: 1rem;
+  }
+}
+
+/* Tablet and Mobile Navigation */
+@media (max-width: 991px) {
+  .navbar-collapse {
+    background: rgba(5, 5, 26, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 10px;
+  }
+
+  .nav-link::after {
+    display: none;
+  }
+}
+
+/* Ensure touch-friendly buttons on mobile */
+@media (max-width: 768px) {
+  button,
+  .btn,
+  .btn-domain,
+  .role-card {
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px !important; /* Prevent zoom on focus */
+  }
+}
+
+/* Fix overflow issues */
+@media (max-width: 768px) {
+  .content-wrapper {
+    overflow-x: hidden;
+  }
+
+  .container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  [class*="col-"] {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .video-container,
+  .video-overlay,
+  #particle-canvas,
+  .navbar,
+  .btn,
+  .btn-domain,
+  footer {
+    display: none !important;
+  }
+
+  .content-wrapper {
+    background: white;
+    color: black;
+  }
+
+  .glass-card {
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: none;
+  }
+}

@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>OtakuVerse | IT - Select Semester</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <style>
+      :root {
+        --it-primary: #00d4ff;
+        --it-secondary: #0099cc;
+        --it-glow: rgba(0, 212, 255, 0.4);
+        --it-glow-strong: rgba(0, 212, 255, 0.6);
+        --glass-bg: rgba(0, 0, 0, 0.45);
+        --glass-border: rgba(0, 212, 255, 0.25);
+
+        /* Consistent Branding Palette */
+        --primary-neon: #b84cff;
+        --secondary-neon: #ff6b9d;
+        --tagline-silver: #e0e0e0;
+        --tagline-violet: #9d50bb;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Space Grotesk", sans-serif;
+        background: #02020a;
+        color: #ffffff;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* --- Cinematic Background Engine --- */
+      .video-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -3;
+      }
+      #bg-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          circle at 50% 50%,
+          transparent 10%,
+          rgba(0, 20, 30, 0.85) 100%
+        );
+        z-index: -1;
+      }
+
+      /* --- IDENTICAL NAVBAR (Same as CS - DO NOT CHANGE) --- */
+      .navbar {
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(25px) saturate(160%);
+        -webkit-backdrop-filter: blur(25px) saturate(160%);
+        border-bottom: 1px solid rgba(184, 76, 255, 0.2);
+        padding: 0.8rem 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .brand-group {
+        display: flex;
+        flex-direction: column;
+        padding-left: 5px;
+      }
+
+      .navbar-brand,
+      .navbar-brand:hover,
+      .navbar-brand:focus,
+      .navbar-brand:active {
+        font-family: "Orbitron", sans-serif;
+        font-weight: 900;
+        font-size: clamp(
+          1.1rem,
+          2.5vw,
+          1.4rem
+        ); /* Fluid architecture boundary scaling */
+        background: linear-gradient(135deg, #b84cff, #ff6b9d);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent !important;
+        letter-spacing: 2px;
+        line-height: 1;
+        transition: opacity 0.3s ease;
+      }
+
+      .navbar-brand:hover {
+        opacity: 0.85;
+        filter: drop-shadow(0 0 8px rgba(184, 76, 255, 0.4));
+      }
+
+      .navbar-brand i {
+        color: #b84cff;
+        -webkit-text-fill-color: initial;
+      }
+
+      .navbar-tagline {
+        font-family: "Orbitron", sans-serif;
+        font-size: clamp(
+          0.45rem,
+          1.2vw,
+          0.55rem
+        ); /* Scalable branding context values */
+        letter-spacing: clamp(1.5px, 0.8vw, 3.5px);
+        background: linear-gradient(90deg, #e0e0e0, #b84cff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-top: 5px;
+        filter: drop-shadow(0 0 5px rgba(184, 76, 255, 0.4));
+      }
+
+      .back-link {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        font-family: "Orbitron", sans-serif;
+        font-size: clamp(0.65rem, 1.5vw, 0.75rem);
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 8px clamp(10px, 2vw, 18px); /* Responsive element padding constraint */
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        white-space: nowrap;
+      }
+
+      .back-link:hover {
+        color: #00ffff;
+        transform: translateX(-5px);
+        border-color: #00d4ff;
+        background: rgba(0, 212, 255, 0.1);
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+        text-shadow: 0 0 10px #00ffff;
+      }
+
+      main {
+        margin-top: clamp(
+          100px,
+          12vw,
+          130px
+        ); /* Flex layout scaling safety cushion */
+        padding-bottom: 50px;
+      }
+
+      /* --- VISIBILITY ENHANCED IT Section Title --- */
+      .section-title {
+        font-family: "Orbitron", sans-serif;
+        font-weight: 900;
+        font-size: clamp(1.5rem, 4vw, 2.2rem);
+        text-align: center;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(90deg, #fff, #00d4ff, #0099cc, #fff);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: itShimmer 5s linear infinite;
+        letter-spacing: 1px;
+        filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.5));
+        text-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+      }
+
+      @keyframes itShimmer {
+        to {
+          background-position: 200% center;
+        }
+      }
+
+      /* --- IT Semester Cards (Cyan/Blue Theme) --- */
+      .semester-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        width: 100%;
+      }
+
+      .semester-card {
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 212, 255, 0.25);
+        border-radius: 24px;
+        padding: 1.5rem clamp(1.2rem, 4vw, 2.5rem); /* Proportional inner block boundaries padding */
+        margin-bottom: 1.2rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 15px; /* Component spatial separation matrix gap */
+      }
+
+      .semester-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at var(--x, 50%) var(--y, 50%),
+          rgba(0, 212, 255, 0.12) 0%,
+          transparent 60%
+        );
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .semester-card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(0, 212, 255, 0.08),
+          transparent
+        );
+        transition: left 0.6s ease;
+      }
+
+      .semester-card:hover::after {
+        left: 100%;
+      }
+
+      .semester-card:hover::before {
+        opacity: 1;
+      }
+
+      .semester-card:hover {
+        transform: translateX(15px) scale(1.01);
+        background: rgba(0, 30, 40, 0.6);
+        border-color: #00d4ff;
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+      }
+
+      .semester-number {
+        font-family: "Orbitron", sans-serif;
+        font-size: clamp(
+          1.4rem,
+          4vw,
+          2rem
+        ); /* Dynamic viewport typography scaling limits */
+        font-weight: 900;
+        color: #fff;
+        text-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        min-width: clamp(
+          85px,
+          15vw,
+          110px
+        ); /* Synchronized layout alignment widths context */
+        transition: 0.4s;
+        flex-shrink: 0;
+      }
+
+      .semester-card:hover .semester-number {
+        color: #00d4ff;
+        text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+      }
+
+      .semester-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 5px;
+        min-width: 0; /* Ensures child ellipsis layout behaves symmetrically inside text frame rules */
+      }
+
+      .semester-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: clamp(
+          0.95rem,
+          2vw,
+          1.1rem
+        ); /* Proportional card subheader definitions */
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .semester-subjects {
+        font-size: clamp(0.75rem, 1.5vw, 0.8rem);
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 400;
+        line-height: 1.6;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .semester-icon {
+        font-size: 1.1rem;
+        color: #00d4ff;
+        opacity: 0.4;
+        transition: 0.4s;
+        margin-left: 10px;
+        flex-shrink: 0;
+      }
+
+      .semester-card:hover .semester-icon {
+        opacity: 1;
+        transform: translateX(8px);
+      }
+
+      /* --- VISIBILITY ENHANCED BOTTOM INFO BAR --- */
+      .info-box {
+        background: rgba(0, 15, 25, 0.7);
+        border: 1px solid rgba(0, 212, 255, 0.4);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-top: 3rem;
+        text-align: center;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        font-size: clamp(0.85rem, 2vw, 0.95rem);
+        color: #ffffff;
+        font-weight: 500;
+        box-shadow:
+          0 0 25px rgba(0, 0, 0, 0.5),
+          0 0 15px rgba(0, 212, 255, 0.1);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .info-box i {
+        color: #00d4ff;
+        filter: drop-shadow(0 0 8px #00d4ff);
+        flex-shrink: 0;
+      }
+
+      /* Responsive Core Breakpoints Injection Matrix */
+      @media (max-width: 768px) {
+        .navbar-tagline {
+          display: none;
+        }
+        .semester-card:hover {
+          transform: translateY(
+            -4px
+          ); /* Contextual vertical tracking fallback shift rules */
+        }
+        .semester-card:hover .semester-icon {
+          transform: translateX(4px);
+        }
+      }
+
+      @media (max-width: 576px) {
+        .semester-card {
+          padding: 1.5rem 1.2rem;
+          flex-direction: column;
+          text-align: center;
+          gap: 12px;
+        }
+        .semester-number {
+          min-width: unset;
+          font-size: 1.5rem;
+          text-align: center;
+        }
+        .semester-info {
+          padding: 0;
+          width: 100%;
+        }
+        .semester-title,
+        .semester-subjects {
+          white-space: normal; /* Grants elegant multiline parsing properties safely over handheld containers */
+          text-overflow: clip;
+          overflow: visible;
+        }
+        .semester-icon {
+          display: none; /* Strips secondary spatial layout elements down on limited displays profiles */
+        }
+        .info-box {
+          flex-direction: column;
+          gap: 8px;
+        }
+      }
+
+      /* Ultra-wide Displays Constraint Guard */
+      @media (min-width: 1800px) {
+        .semester-container {
+          max-width: 950px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="video-container">
+      <video autoplay muted loop playsinline id="bg-video">
+        <source src="/assets/videos/IT.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay"></div>
+    </div>
+
+    <!-- IDENTICAL NAVBAR (Same as CS - DO NOT CHANGE) -->
+    <nav class="navbar">
+      <div class="container d-flex justify-content-between align-items-center">
+        <div class="brand-group">
+          <a class="navbar-brand" href="../../../user/home.html">
+            <i class="fas fa-infinity me-2"></i>OTAKUVERSE
+          </a>
+          <span class="navbar-tagline">Where Knowledge Meets Infinity</span>
+        </div>
+        <a href="../../../user/home.html" class="back-link">
+          <i class="fas fa-th-large me-2"></i> DASHBOARD
+        </a>
+      </div>
+    </nav>
+
+    <main>
+      <div class="semester-container">
+        <div class="text-center mb-5">
+          <h2 class="section-title">INFORMATION TECHNOLOGY</h2>
+          <p
+            class="small"
+            style="
+              letter-spacing: 4px;
+              font-family: &quot;Orbitron&quot;;
+              color: #00d4ff;
+              text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+              font-weight: 700;
+            "
+          >
+            SECURE NETWORK HUB
+          </p>
+        </div>
+
+        <!-- Semester 1 -->
+        <div
+          class="semester-card"
+          onclick="window.location.href = 'sem1-notes.html'"
+        >
+          <div class="semester-number">SEM 01</div>
+          <div class="semester-info">
+            <div class="semester-title">IT Foundations</div>
+            <div class="semester-subjects">
+              Computer Hardware | OS Basics | Networking Essentials
+            </div>
+          </div>
+          <div class="semester-icon"><i class="fas fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Semester 2 -->
+        <div
+          class="semester-card"
+          onclick="window.location.href = 'sem2-notes.html'"
+        >
+          <div class="semester-number">SEM 02</div>
+          <div class="semester-info">
+            <div class="semester-title">System Administration</div>
+            <div class="semester-subjects">
+              Windows Server | Linux Admin | Scripting
+            </div>
+          </div>
+          <div class="semester-icon"><i class="fas fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Semester 3 -->
+        <div
+          class="semester-card"
+          onclick="window.location.href = 'sem3-notes.html'"
+        >
+          <div class="semester-number">SEM 03</div>
+          <div class="semester-info">
+            <div class="semester-title">Network Infrastructure</div>
+            <div class="semester-subjects">
+              Routing & Switching | Network Security | CCNA Prep
+            </div>
+          </div>
+          <div class="semester-icon"><i class="fas fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Semester 4 -->
+        <div
+          class="semester-card"
+          onclick="window.location.href = 'sem4-notes.html'"
+        >
+          <div class="semester-number">SEM 04</div>
+          <div class="semester-info">
+            <div class="semester-title">Cybersecurity & Cloud</div>
+            <div class="semester-subjects">
+              Security+ | AWS | Ethical Hacking | Firewalls
+            </div>
+          </div>
+          <div class="semester-icon"><i class="fas fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Semester 5 -->
+        <div
+          class="semester-card"
+          onclick="window.location.href = 'sem5-notes.html'"
+        >
+          <div class="semester-number">SEM 05</div>
+          <div class="semester-info">
+            <div class="semester-title">Enterprise IT Operations</div>
+            <div class="semester-subjects">
+              ITIL | DevOps | Automation | Monitoring
+            </div>
+          </div>
+          <div class="semester-icon"><i class="fas fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Semester 6 -->
+        <div
+          class="semester-card"
+          onclick="window.location.href = 'sem6-notes.html'"
+        >
+          <div class="semester-number">SEM 06</div>
+          <div class="semester-info">
+            <div class="semester-title">IT Capstone & Security</div>
+            <div class="semester-subjects">
+              Security Operations | IR | SOC | Final Project
+            </div>
+          </div>
+          <div class="semester-icon"><i class="fas fa-chevron-right"></i></div>
+        </div>
+
+        <div class="info-box">
+          <i class="fas fa-microchip fa-spin me-2"></i>
+          <span
+            >Select a semester to access System Notes and Network
+            Configurations.</span
+          >
+        </div>
+      </div>
+    </main>
+
+    <script>
+      document.querySelectorAll(".semester-card").forEach((card) => {
+        card.addEventListener("mousemove", (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+          card.style.setProperty("--x", `${x}%`);
+          card.style.setProperty("--y", `${y}%`);
+        });
+      });
+
+      anime({
+        targets: ".semester-card",
+        translateX: [-30, 0],
+        opacity: [0, 1],
+        delay: anime.stagger(80),
+        duration: 1000,
+        easing: "easeOutQuart",
+      });
+    </script>
+    <script src="/js/title-manager.js"></script>
+  </body>
+</html>

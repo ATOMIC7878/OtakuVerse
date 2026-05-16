@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>OtakuVerse | Cyber Reader</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary-neon: #b84cff;
+        --secondary-neon: #ff6b9d;
+        --it-cyan: #00d4ff;
+        --bg-dark: #02020a;
+        --tagline-silver: #e0e0e0;
+        --tagline-violet: #9d50bb;
+        --primary-glow: rgba(184, 76, 255, 0.35);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: "Space Grotesk", sans-serif;
+        background: var(--bg-dark);
+        color: #ffffff;
+        height: 100vh;
+        overflow: hidden;
+        touch-action: none;
+      }
+
+      /* --- Replicated SEM3 Navbar System --- */
+      .reader-header {
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.8rem clamp(0.75rem, 3vw, 1.5rem); /* Adaptive horizontal spacing padding */
+        position: fixed;
+        top: 0;
+        width: 100%;
+        /* FIXED: Ensuring Navbar sits above PDF */
+        z-index: 9998;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        gap: 10px; /* Layout crash containment safeguard */
+      }
+
+      /* --- Synced Branding Section --- */
+      .brand-group {
+        display: flex;
+        flex-direction: column;
+        padding-left: 5px;
+        min-width: 0; /* Protects inner tracking wrappers from overflow leak bugs */
+      }
+
+      .logo-row {
+        display: flex;
+        align-items: center;
+      }
+
+      .logo-icon {
+        font-size: clamp(
+          1.1rem,
+          2.5vw,
+          1.4rem
+        ); /* Responsive fluid glyphtrace sizing */
+        background: linear-gradient(
+          135deg,
+          var(--primary-neon),
+          var(--secondary-neon)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent !important;
+        -webkit-text-fill-color: transparent;
+        margin-right: 0.5rem;
+        flex-shrink: 0;
+      }
+
+      .logo-text {
+        font-family: "Orbitron", sans-serif;
+        font-weight: 900;
+        font-size: clamp(
+          1.1rem,
+          2.5vw,
+          1.4rem
+        ); /* Fluid text scaling properties */
+        letter-spacing: 2px;
+        line-height: 1;
+        margin: 0;
+        background: linear-gradient(
+          135deg,
+          var(--primary-neon),
+          var(--secondary-neon)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent !important;
+        -webkit-text-fill-color: transparent;
+        transition: opacity 0.3s ease;
+      }
+
+      .logo-text:hover {
+        opacity: 0.85;
+        filter: drop-shadow(0 0 20px var(--primary-glow));
+      }
+
+      .tagline {
+        font-family: "Orbitron", sans-serif;
+        font-size: clamp(
+          0.45rem,
+          1.2vw,
+          0.55rem
+        ); /* Proportional tagline breakdown scaling */
+        font-weight: 700;
+        letter-spacing: clamp(1.5px, 0.8vw, 3.5px);
+        text-transform: uppercase;
+        margin-top: 5px;
+        background: linear-gradient(
+          90deg,
+          var(--tagline-silver),
+          var(--tagline-violet)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        filter: drop-shadow(0 0 5px rgba(157, 80, 187, 0.4));
+        opacity: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis; /* Graceful text boundary clip on smaller screens */
+      }
+
+      /* --- FIXED: Visibility Stacking for Page Counter --- */
+      .page-counter {
+        position: relative;
+        /* FIXED: Elevated stacking level */
+        z-index: 9999;
+        font-family: "Orbitron";
+        font-size: clamp(
+          0.65rem,
+          1.5vw,
+          0.75rem
+        ); /* Flexible numeric typography scaling rules */
+        /* SLIGHTLY STRENGTHENED: Background for superior readability */
+        background: rgba(184, 76, 255, 0.15);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        padding: 5px clamp(8px, 2vw, 15px);
+        border-radius: 4px;
+        color: var(--primary-neon);
+        border: 1px solid rgba(184, 76, 255, 0.3);
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      /* --- Refined Side Navigation Arrows --- */
+      .nav-trigger {
+        position: fixed;
+        top: 60px;
+        bottom: 0;
+        width: 10%;
+        min-width: clamp(
+          45px,
+          8vw,
+          60px
+        ); /* Proportional scaling touch parameters */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 900;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .nav-trigger.active {
+        opacity: 0.7;
+      }
+      .nav-trigger:hover {
+        opacity: 1 !important;
+      }
+      .nav-trigger.left {
+        left: 0;
+      }
+      .nav-trigger.right {
+        right: 0;
+      }
+
+      .nav-trigger i {
+        font-size: clamp(
+          1.6rem,
+          4vw,
+          2.2rem
+        ); /* Dynamic button font dimensions handling */
+        color: #fff;
+        filter: drop-shadow(0 0 10px var(--primary-neon));
+        transition: transform 0.3s ease;
+      }
+
+      .nav-trigger:hover i {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 15px var(--it-cyan));
+        color: var(--it-cyan);
+      }
+
+      .viewer-container {
+        height: 100vh;
+        overflow-y: auto;
+        padding: clamp(95px, 12vw, 110px) 10px 40px; /* Adaptive top canvas tracking cushions */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: radial-gradient(circle at center, #0a0a1f 0%, #02020a 100%);
+        cursor: grab;
+        /* Ensuring PDF layer is below navbar */
+        z-index: 1;
+        width: 100%;
+      }
+
+      #pdf-canvas {
+        margin: 0 auto;
+        border-radius: 4px;
+        box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
+        background: white;
+        image-rendering: -webkit-optimize-contrast;
+        max-width: 100%; /* Fix layout breaking edge bleed behaviors across mobile screens */
+        height: auto !important;
+      }
+
+      .btn-exit {
+        position: relative;
+        z-index: 9999;
+        background: rgba(255, 71, 87, 0.1);
+        border: 1px solid rgba(255, 71, 87, 0.3);
+        color: #ff4757;
+        font-family: "Orbitron";
+        font-size: clamp(
+          0.55rem,
+          1.2vw,
+          0.65rem
+        ); /* Scale contextual buttons text labels proportionally */
+        padding: 5px clamp(8px, 1.8vw, 12px);
+        border-radius: 4px;
+        transition: 0.3s ease;
+        text-transform: uppercase;
+        font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .btn-exit:hover {
+        background: #ff4757;
+        color: white;
+        box-shadow: 0 0 15px rgba(255, 71, 87, 0.4);
+      }
+
+      /* --- Adaptive Breakpoint Matrices --- */
+      @media (max-width: 768px) {
+        .tagline {
+          display: none; /* Safely hides string footprint inside micro resolutions layout bounds */
+        }
+        .nav-trigger {
+          opacity: 0.4 !important; /* Preserves control location visibility targets across touchscreen profiles */
+        }
+      }
+
+      @media (max-width: 480px) {
+        .reader-header {
+          padding: 0.6rem 0.75rem;
+        }
+        .brand-group {
+          padding-left: 2px;
+        }
+        .logo-text {
+          display: none; /* Hide branding text label to keep layout bar clean on small displays */
+        }
+        .logo-icon {
+          margin-right: 0;
+        }
+      }
+
+      /* Ultra-wide Screen Resolution Protect Constraint */
+      @media (min-width: 1800px) {
+        #pdf-canvas {
+          max-width: 1200px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Side Triggers -->
+    <div class="nav-trigger left" id="prevZone">
+      <i class="fas fa-angle-left"></i>
+    </div>
+    <div class="nav-trigger right" id="nextZone">
+      <i class="fas fa-angle-right"></i>
+    </div>
+
+    <header class="reader-header">
+      <div class="brand-group">
+        <div class="logo-row">
+          <i class="fas fa-infinity logo-icon"></i>
+          <h1 class="logo-text">OTAKUVERSE</h1>
+        </div>
+        <span class="tagline">Where Knowledge Meets Infinity</span>
+      </div>
+
+      <div class="page-counter">
+        <span id="num">00</span> <span style="opacity: 0.3">/</span>
+        <span id="total">00</span>
+      </div>
+
+      <button onclick="window.close()" class="btn-exit">Terminate</button>
+    </header>
+
+    <div class="viewer-container" id="scroll-area">
+      <canvas id="pdf-canvas"></canvas>
+    </div>
+
+    <script>
+      /* --- LOGIC REMAINS COMPLETELY UNTOUCHED --- */
+      const pdfjsLib = window["pdfjs-dist/build/pdf"];
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
+
+      const fileUrl = sessionStorage.getItem("pdf_viewer_file");
+      const fileTitle = sessionStorage.getItem("pdf_viewer_title");
+
+      if (fileTitle) {
+        document.title = "OtakuVerse | " + fileTitle;
+      }
+
+      let pdfDoc = null,
+        pageNum = 1,
+        pageRendering = false,
+        pageNumPending = null;
+      const canvas = document.getElementById("pdf-canvas"),
+        ctx = canvas.getContext("2d");
+      const scrollArea = document.getElementById("scroll-area");
+      const triggers = document.querySelectorAll(".nav-trigger");
+
+      let fadeTimer;
+      function wakeControls() {
+        triggers.forEach((t) => t.classList.add("active"));
+        clearTimeout(fadeTimer);
+        fadeTimer = setTimeout(() => {
+          triggers.forEach((t) => t.classList.remove("active"));
+        }, 2500);
+      }
+      window.addEventListener("mousemove", wakeControls);
+      window.addEventListener("touchstart", wakeControls);
+
+      function renderPage(num) {
+        pageRendering = true;
+        pdfDoc.getPage(num).then((page) => {
+          const dpr = window.devicePixelRatio || 1;
+          const windowWidth = window.innerWidth;
+          const baseScale =
+            windowWidth < 768
+              ? (windowWidth * 0.95) / page.getViewport({ scale: 1 }).width
+              : 1.5;
+          const viewport = page.getViewport({ scale: baseScale * dpr });
+
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          canvas.style.width = viewport.width / dpr + "px";
+          canvas.style.height = viewport.height / dpr + "px";
+
+          page
+            .render({ canvasContext: ctx, viewport: viewport })
+            .promise.then(() => {
+              pageRendering = false;
+              if (pageNumPending !== null) {
+                renderPage(pageNumPending);
+                pageNumPending = null;
+              }
+            });
+
+          document.getElementById("num").textContent = num
+            .toString()
+            .padStart(2, "0");
+          scrollArea.scrollTo({ top: 0, behavior: "smooth" });
+          wakeControls();
+        });
+      }
+
+      function queueRenderPage(num) {
+        if (pageRendering) {
+          pageNumPending = num;
+        } else {
+          renderPage(num);
+        }
+      }
+
+      const goPrev = () => {
+        if (pageNum <= 1) return;
+        pageNum--;
+        queueRenderPage(pageNum);
+      };
+      const goNext = () => {
+        if (!pdfDoc || pageNum >= pdfDoc.numPages) return;
+        pageNum++;
+        queueRenderPage(pageNum);
+      };
+
+      let startX = 0;
+      let isDragging = false;
+      const startAction = (x) => {
+        startX = x;
+        isDragging = true;
+      };
+      const endAction = (x) => {
+        if (!isDragging) return;
+        const diff = x - startX;
+        if (diff > 100) goPrev();
+        else if (diff < -100) goNext();
+        isDragging = false;
+      };
+
+      scrollArea.addEventListener("mousedown", (e) => startAction(e.pageX));
+      window.addEventListener("mouseup", (e) => endAction(e.pageX));
+      scrollArea.addEventListener("touchstart", (e) =>
+        startAction(e.touches[0].pageX),
+      );
+      scrollArea.addEventListener("touchend", (e) =>
+        endAction(e.changedTouches[0].pageX),
+      );
+
+      document.getElementById("prevZone").addEventListener("click", goPrev);
+      document.getElementById("nextZone").addEventListener("click", goNext);
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") goPrev();
+        if (e.key === "ArrowRight") goNext();
+      });
+
+      if (fileUrl) {
+        pdfjsLib
+          .getDocument({
+            url: fileUrl,
+            disableRange: true,
+            disableStream: true,
+            cMapUrl:
+              "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/cmaps/",
+            cMapPacked: true,
+          })
+          .promise.then((doc) => {
+            pdfDoc = doc;
+            document.getElementById("total").textContent = doc.numPages
+              .toString()
+              .padStart(2, "0");
+            renderPage(pageNum);
+            wakeControls();
+          });
+      }
+
+      window.addEventListener("resize", () => {
+        if (pdfDoc) queueRenderPage(pageNum);
+      });
+    </script>
+  </body>
+</html>

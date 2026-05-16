@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>OtakuVerse | User Registration</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Space Grotesk", "Inter", sans-serif;
+        overflow-x: hidden;
+        color: #ffffff;
+        min-height: 100vh;
+      }
+
+      .video-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -2;
+      }
+
+      #bg-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          rgba(0, 0, 0, 0.6) 0%,
+          rgba(0, 0, 0, 0.4) 50%,
+          rgba(0, 0, 0, 0.6) 100%
+        );
+        z-index: 1;
+      }
+
+      #particle-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .content-wrapper {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(15px, 4vw, 30px);
+        width: 100%;
+      }
+
+      .auth-container {
+        max-width: 550px;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+        border-radius: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        padding: 50px 40px;
+        transition: all 0.3s ease;
+      }
+
+      .auth-container:hover {
+        border-color: rgba(184, 76, 255, 0.5);
+        box-shadow: 0 0 30px rgba(184, 76, 255, 0.2);
+        transform: translateY(-5px);
+      }
+
+      .auth-logo {
+        text-align: center;
+        margin-bottom: 30px;
+        width: 100%;
+      }
+
+      .auth-logo i {
+        font-size: clamp(3rem, 8vw, 4rem);
+        background: linear-gradient(135deg, #b84cff, #ff6b9d);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: pulseGlow 2s ease-in-out infinite;
+        display: inline-block;
+      }
+
+      .auth-logo h2 {
+        font-size: clamp(1.6rem, 4vw, 2rem);
+        font-weight: 700;
+        font-family: "Orbitron", monospace;
+        margin-top: 15px;
+        background: linear-gradient(135deg, #ffffff, #b84cff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .auth-logo p {
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 10px;
+        font-size: clamp(0.85rem, 2vw, 1rem);
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        width: 100%;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .form-group label i {
+        margin-right: 8px;
+        color: #b84cff;
+      }
+
+      .password-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 45px 12px 15px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        color: white;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        font-family: "Space Grotesk", sans-serif;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: #b84cff;
+        box-shadow: 0 0 15px rgba(184, 76, 255, 0.3);
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .form-control.is-invalid {
+        border-color: #ff4757;
+      }
+
+      .password-toggle {
+        position: absolute;
+        right: 15px;
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .password-toggle:hover {
+        color: #b84cff;
+        transform: scale(1.1);
+      }
+
+      .password-strength {
+        margin-top: 8px;
+        width: 100%;
+      }
+
+      .strength-text {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .strength-bar {
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        margin-top: 5px;
+        overflow: hidden;
+        width: 100%;
+      }
+
+      .strength-bar-fill {
+        height: 100%;
+        width: 0;
+        transition:
+          width 0.3s ease,
+          background 0.3s ease;
+      }
+
+      .invalid-feedback {
+        color: #ff4757;
+        font-size: 0.75rem;
+        margin-top: 5px;
+      }
+
+      .btn-auth {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #b84cff, #ff6b9d);
+        border: none;
+        border-radius: 50px;
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-family: "Orbitron", monospace;
+      }
+
+      .btn-auth:hover:not(:disabled) {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(184, 76, 255, 0.4);
+      }
+
+      .btn-auth:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .auth-link {
+        text-align: center;
+        margin-top: 25px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+        width: 100%;
+      }
+
+      .auth-link a {
+        color: #b84cff;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .auth-link a:hover {
+        color: #ff6b9d;
+        text-decoration: underline;
+      }
+
+      .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+        white-space: nowrap;
+      }
+
+      .back-link:hover {
+        color: #b84cff;
+        transform: translateX(-5px);
+      }
+
+      @keyframes pulseGlow {
+        0%,
+        100% {
+          text-shadow: 0 0 20px rgba(184, 76, 255, 0.5);
+        }
+        50% {
+          text-shadow: 0 0 40px rgba(184, 76, 255, 0.8);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+      @media (max-width: 576px) {
+        .auth-container {
+          padding: 35px 25px;
+          margin: 15px;
+          border-radius: 24px;
+        }
+        .form-control {
+          padding: 12px 40px 12px 12px;
+          font-size: 0.95rem;
+        }
+        .btn-auth {
+          padding: 12px;
+          font-size: 0.95rem;
+        }
+      }
+
+      @media (min-width: 1800px) {
+        .auth-container {
+          max-width: 570px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="video-container">
+      <video autoplay muted loop playsinline preload="metadata" id="bg-video">
+        <source src="../../assets/videos/main-bg.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay"></div>
+    </div>
+
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="content-wrapper">
+      <div class="auth-container fade-in-up">
+        <div class="auth-logo">
+          <i class="fas fa-infinity"></i>
+          <h2>Create Account</h2>
+          <p>Join OtakuVerse and start learning</p>
+        </div>
+
+        <form id="registerForm">
+          <div class="form-group">
+            <label for="email"
+              ><i class="fas fa-envelope"></i> Email Address</label
+            >
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              placeholder="Enter your email"
+              required
+            />
+            <div class="invalid-feedback" id="emailError"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="password"><i class="fas fa-lock"></i> Password</label>
+            <div class="password-wrapper">
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                placeholder="Create a strong password"
+                required
+              />
+              <button type="button" class="password-toggle" id="togglePassword">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="password-strength">
+              <div class="strength-text" id="passwordStrength">
+                Password Strength:
+              </div>
+              <div class="strength-bar">
+                <div class="strength-bar-fill" id="strengthFill"></div>
+              </div>
+            </div>
+            <div class="invalid-feedback" id="passwordError"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword"
+              ><i class="fas fa-check-circle"></i> Confirm Password</label
+            >
+            <div class="password-wrapper">
+              <input
+                type="password"
+                class="form-control"
+                id="confirmPassword"
+                placeholder="Confirm your password"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                id="toggleConfirmPassword"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback" id="confirmError"></div>
+          </div>
+
+          <button type="submit" class="btn-auth" id="registerBtn">
+            <i class="fas fa-user-plus"></i> Create Account
+          </button>
+        </form>
+
+        <div class="auth-link">
+          Already have an account? <a href="login.html">Login here</a>
+        </div>
+
+        <div class="text-center">
+          <a href="select-role.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Role Selection
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const API_BASE = "http://localhost:5000/api/v1";
+
+      // Three.js Particle System
+      const canvas = document.getElementById("particle-canvas");
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000,
+      );
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+
+      const particleCount = 600;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 2000;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 1000;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 500;
+        const colorChoice = Math.random();
+        if (colorChoice < 0.5) {
+          colors[i * 3] = 0.72;
+          colors[i * 3 + 1] = 0.3;
+          colors[i * 3 + 2] = 1.0;
+        } else {
+          colors[i * 3] = 1.0;
+          colors[i * 3 + 1] = 0.42;
+          colors[i * 3 + 2] = 0.62;
+        }
+      }
+
+      geometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(positions, 3),
+      );
+      geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+      const particleMaterial = new THREE.PointsMaterial({
+        size: 0.6,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.3,
+        blending: THREE.AdditiveBlending,
+      });
+
+      const particles = new THREE.Points(geometry, particleMaterial);
+      scene.add(particles);
+      camera.position.z = 500;
+
+      let mouseX = 0,
+        mouseY = 0;
+      document.addEventListener("mousemove", (event) => {
+        mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+      });
+
+      function animateParticles() {
+        requestAnimationFrame(animateParticles);
+        particles.rotation.y += 0.0003;
+        particles.rotation.x += 0.0002;
+        particles.rotation.x += mouseY * 0.0003;
+        particles.rotation.y += mouseX * 0.0003;
+        renderer.render(scene, camera);
+      }
+      animateParticles();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Video fallback
+      const video = document.getElementById("bg-video");
+      if (video) {
+        video.play().catch((e) => {
+          document.querySelector(".video-overlay").style.background =
+            "linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9))";
+        });
+      }
+
+      // Password visibility toggles
+      const togglePassword = document.getElementById("togglePassword");
+      const toggleConfirmPassword = document.getElementById(
+        "toggleConfirmPassword",
+      );
+      const passwordInput = document.getElementById("password");
+      const confirmInput = document.getElementById("confirmPassword");
+
+      togglePassword.addEventListener("click", function () {
+        const type =
+          passwordInput.getAttribute("type") === "password"
+            ? "text"
+            : "password";
+        passwordInput.setAttribute("type", type);
+        this.querySelector("i").classList.toggle("fa-eye");
+        this.querySelector("i").classList.toggle("fa-eye-slash");
+      });
+
+      toggleConfirmPassword.addEventListener("click", function () {
+        const type =
+          confirmInput.getAttribute("type") === "password"
+            ? "text"
+            : "password";
+        confirmInput.setAttribute("type", type);
+        this.querySelector("i").classList.toggle("fa-eye");
+        this.querySelector("i").classList.toggle("fa-eye-slash");
+      });
+
+      // Password strength checker
+      function checkPasswordStrength(password) {
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (password.match(/[a-z]+/)) strength++;
+        if (password.match(/[A-Z]+/)) strength++;
+        if (password.match(/[0-9]+/)) strength++;
+        if (password.match(/[$@#&!]+/)) strength++;
+
+        const strengths = ["Very Weak", "Weak", "Fair", "Good", "Strong"];
+        const colors = ["#ff4757", "#ffb347", "#ffd700", "#05df8b", "#00ff88"];
+        const percentages = [20, 40, 60, 80, 100];
+
+        const level = strength - 1;
+        return {
+          text: strengths[level] || "Very Weak",
+          color: colors[level] || colors[0],
+          width: percentages[level] || 20,
+        };
+      }
+
+      passwordInput.addEventListener("input", () => {
+        const strength = checkPasswordStrength(passwordInput.value);
+        document.getElementById("passwordStrength").innerHTML =
+          `Password Strength: <span style="color: ${strength.color}">${strength.text}</span>`;
+        const strengthFill = document.getElementById("strengthFill");
+        strengthFill.style.width = `${strength.width}%`;
+        strengthFill.style.background = strength.color;
+      });
+
+      // Form submission - REAL API INTEGRATION
+      const registerForm = document.getElementById("registerForm");
+      const registerBtn = document.getElementById("registerBtn");
+
+      registerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const password = passwordInput.value;
+        const confirmPassword = confirmInput.value;
+
+        // Reset errors
+        document.getElementById("emailError").textContent = "";
+        document.getElementById("passwordError").textContent = "";
+        document.getElementById("confirmError").textContent = "";
+        document.getElementById("email").classList.remove("is-invalid");
+        passwordInput.classList.remove("is-invalid");
+        confirmInput.classList.remove("is-invalid");
+
+        let hasError = false;
+
+        if (!email) {
+          document.getElementById("emailError").textContent =
+            "Email is required";
+          document.getElementById("email").classList.add("is-invalid");
+          hasError = true;
+        } else if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+          document.getElementById("emailError").textContent =
+            "Please enter a valid email";
+          document.getElementById("email").classList.add("is-invalid");
+          hasError = true;
+        }
+
+        if (!password) {
+          document.getElementById("passwordError").textContent =
+            "Password is required";
+          passwordInput.classList.add("is-invalid");
+          hasError = true;
+        } else if (password.length < 8) {
+          document.getElementById("passwordError").textContent =
+            "Password must be at least 8 characters";
+          passwordInput.classList.add("is-invalid");
+          hasError = true;
+        } else if (!/[A-Z]/.test(password)) {
+          document.getElementById("passwordError").textContent =
+            "Password must contain at least one uppercase letter";
+          passwordInput.classList.add("is-invalid");
+          hasError = true;
+        } else if (!/[a-z]/.test(password)) {
+          document.getElementById("passwordError").textContent =
+            "Password must contain at least one lowercase letter";
+          passwordInput.classList.add("is-invalid");
+          hasError = true;
+        } else if (!/[0-9]/.test(password)) {
+          document.getElementById("passwordError").textContent =
+            "Password must contain at least one number";
+          passwordInput.classList.add("is-invalid");
+          hasError = true;
+        }
+
+        if (password !== confirmPassword) {
+          document.getElementById("confirmError").textContent =
+            "Passwords do not match";
+          confirmInput.classList.add("is-invalid");
+          hasError = true;
+        }
+
+        if (hasError) return;
+
+        registerBtn.disabled = true;
+        registerBtn.innerHTML =
+          '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+
+        try {
+          const response = await fetch(`${API_BASE}/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: email,
+              password: password,
+              confirmPassword: confirmPassword,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            localStorage.setItem("token", data.data.token);
+            localStorage.setItem("userEmail", data.data.user.email);
+            localStorage.setItem("userRole", "aspirant");
+
+            showNotification(
+              "Registration successful! Redirecting...",
+              "success",
+            );
+            setTimeout(() => {
+              window.location.href = "/pages/auth/login.html";
+            }, 1500);
+          } else {
+            showNotification(data.message || "Registration failed", "error");
+            registerBtn.disabled = false;
+            registerBtn.innerHTML =
+              '<i class="fas fa-user-plus"></i> Create Account';
+          }
+        } catch (error) {
+          console.error("Registration error:", error);
+          showNotification("Registration failed. Please try again.", "error");
+          registerBtn.disabled = false;
+          registerBtn.innerHTML =
+            '<i class="fas fa-user-plus"></i> Create Account';
+        }
+      });
+
+      function showNotification(message, type) {
+        const notification = document.createElement("div");
+        notification.innerHTML = `<i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"}"></i> ${message}`;
+        notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === "success" ? "#05df8b" : "#ff4757"};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                z-index: 10000;
+                cursor: pointer;
+                animation: fadeInUp 0.3s ease;
+            `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+        notification.onclick = () => notification.remove();
+      }
+
+      // Anime.js animation
+      if (typeof anime !== "undefined") {
+        anime({
+          targets: ".auth-container",
+          opacity: [0, 1],
+          scale: [0.9, 1],
+          duration: 800,
+          easing: "easeOutElastic(1, .5)",
+        });
+      }
+    </script>
+    <script src="/js/title-manager.js"></script>
+  </body>
+</html>

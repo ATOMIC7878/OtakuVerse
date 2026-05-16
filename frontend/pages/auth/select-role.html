@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>OtakuVerse | Select Your Role</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Space Grotesk", "Inter", sans-serif;
+        overflow-x: hidden;
+        color: #ffffff;
+        min-height: 100vh;
+      }
+
+      /* Video Background */
+      .video-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -2;
+      }
+
+      #bg-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          rgba(0, 0, 0, 0.6) 0%,
+          rgba(0, 0, 0, 0.4) 50%,
+          rgba(0, 0, 0, 0.6) 100%
+        );
+        z-index: 1;
+      }
+
+      /* Particle Canvas */
+      #particle-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .content-wrapper {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+      }
+
+      /* Role Selection Container - Enhanced Responsive */
+      .role-selection-container {
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 50px;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(0px);
+        border-radius: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        transition: all 0.3s ease;
+      }
+
+      .role-selection-container:hover {
+        border-color: rgba(184, 76, 255, 0.5);
+        box-shadow: 0 0 40px rgba(184, 76, 255, 0.2);
+      }
+
+      /* Logo Section - Responsive Typography */
+      .logo-large {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .logo-large i {
+        font-size: clamp(3rem, 8vw, 5rem);
+        background: linear-gradient(135deg, #b84cff, #ff6b9d);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: pulseGlow 2s ease-in-out infinite;
+      }
+
+      .logo-large h1 {
+        font-size: clamp(1.6rem, 6vw, 3rem);
+        font-weight: 800;
+        font-family: "Orbitron", monospace;
+        margin-top: 15px;
+        background: linear-gradient(135deg, #ffffff, #b84cff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .tagline {
+        font-size: clamp(0.7rem, 3vw, 1.1rem);
+        letter-spacing: 3.5px;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: linear-gradient(90deg, #e0e0e0, #9d50bb);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        filter: drop-shadow(0 0 5px rgba(157, 80, 187, 0.4));
+      }
+
+      .selection-title {
+        text-align: center;
+        margin: 40px 0 30px;
+      }
+
+      .selection-title h3 {
+        font-size: clamp(1.3rem, 5vw, 2rem);
+        font-weight: 600;
+        font-family: "Orbitron", monospace;
+        background: linear-gradient(135deg, #ffffff, #ff6b9d);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .selection-title p {
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 10px;
+        font-size: clamp(0.8rem, 3vw, 1rem);
+      }
+
+      /* Role Cards - Enhanced Responsive */
+      .role-card {
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 25px;
+        padding: 40px 30px;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Card Shine Effect */
+      .role-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        transition: left 0.6s ease;
+      }
+
+      .role-card:hover::before {
+        left: 100%;
+      }
+
+      /* User Card */
+      .user-card {
+        border-top: 4px solid #00d4ff;
+      }
+
+      .user-card:hover {
+        transform: translateY(-15px) scale(1.03);
+        box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+        border-color: #00d4ff;
+        background: rgba(0, 212, 255, 0.08);
+      }
+
+      /* Admin Card */
+      .admin-card {
+        border-top: 4px solid #b84cff;
+      }
+
+      .admin-card:hover {
+        transform: translateY(-15px) scale(1.03);
+        box-shadow:
+          0 0 50px rgba(184, 76, 255, 0.5),
+          0 0 30px rgba(255, 107, 157, 0.3);
+        border-color: #ff6b9d;
+        background: linear-gradient(
+          135deg,
+          rgba(184, 76, 255, 0.12),
+          rgba(255, 107, 157, 0.08)
+        );
+      }
+
+      .role-icon {
+        font-size: clamp(2.5rem, 8vw, 4rem);
+        margin-bottom: 20px;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        display: inline-block;
+      }
+
+      .user-card .role-icon {
+        color: #00d4ff;
+        text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+      }
+
+      .admin-card .role-icon {
+        color: #b84cff;
+        text-shadow: 0 0 20px rgba(184, 76, 255, 0.5);
+      }
+
+      .user-card:hover .role-icon {
+        transform: scale(1.15) rotate(5deg);
+        text-shadow: 0 0 30px rgba(0, 212, 255, 0.8);
+      }
+
+      .admin-card:hover .role-icon {
+        transform: scale(1.15) rotate(5deg);
+        color: #ff6b9d;
+        text-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
+      }
+
+      .role-card h3 {
+        font-size: clamp(1.2rem, 5vw, 1.6rem);
+        font-weight: 700;
+        margin-bottom: 12px;
+        font-family: "Orbitron", monospace;
+      }
+
+      .user-card h3 {
+        color: #00d4ff;
+      }
+
+      .admin-card h3 {
+        color: #b84cff;
+      }
+
+      .admin-card:hover h3 {
+        color: #ff6b9d;
+        text-shadow: 0 0 15px rgba(255, 107, 157, 0.5);
+      }
+
+      .role-description {
+        color: rgba(255, 255, 255, 0.85);
+        margin-bottom: 20px;
+        line-height: 1.5;
+        font-size: clamp(0.8rem, 3vw, 0.9rem);
+        min-height: 65px;
+      }
+
+      /* Role Features - Responsive */
+      .role-features {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 25px;
+        text-align: left;
+        padding: 0 10px;
+        flex-grow: 1;
+        min-height: 200px;
+      }
+
+      .role-features span {
+        font-size: clamp(0.7rem, 3vw, 0.85rem);
+        color: rgba(255, 255, 255, 0.8);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+      }
+
+      .user-card:hover .role-features span {
+        color: #00d4ff;
+      }
+
+      .admin-card:hover .role-features span {
+        color: #ff6b9d;
+      }
+
+      .role-features i {
+        margin-right: 12px;
+        width: 20px;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+
+      .user-card .role-features i {
+        color: #00d4ff;
+      }
+
+      .admin-card .role-features i {
+        color: #b84cff;
+      }
+
+      .admin-card:hover .role-features i {
+        color: #ff6b9d;
+      }
+
+      /* Role Button */
+      .btn-role {
+        width: 100%;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-family: "Orbitron", monospace;
+        font-size: clamp(0.75rem, 3vw, 0.9rem);
+        margin-top: auto;
+      }
+
+      .user-card .btn-role:hover {
+        background: #00d4ff;
+        border-color: #00d4ff;
+        transform: translateX(8px);
+        box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        color: #000;
+      }
+
+      .admin-card .btn-role:hover {
+        background: linear-gradient(135deg, #b84cff, #ff6b9d);
+        border-color: #ff6b9d;
+        transform: translateX(8px);
+        box-shadow: 0 5px 25px rgba(184, 76, 255, 0.5);
+      }
+
+      /* Back Link */
+      .back-link {
+        display: inline-block;
+        margin-top: 30px;
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: clamp(0.85rem, 4vw, 1rem);
+      }
+
+      .back-link:hover {
+        color: #b84cff;
+        transform: translateX(-8px);
+      }
+
+      /* Animations */
+      @keyframes pulseGlow {
+        0%,
+        100% {
+          text-shadow: 0 0 20px rgba(184, 76, 255, 0.5);
+        }
+        50% {
+          text-shadow: 0 0 40px rgba(184, 76, 255, 0.8);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      @keyframes ripple {
+        0% {
+          transform: scale(0);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(50);
+          opacity: 0;
+        }
+      }
+
+      .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+      .float-animation {
+        animation: float 3s ease-in-out infinite;
+      }
+
+      /* Grid Layout */
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        margin-right: -15px;
+        margin-left: -15px;
+      }
+
+      [class*="col-"] {
+        display: flex;
+        margin-bottom: 30px;
+        padding-right: 15px;
+        padding-left: 15px;
+      }
+
+      .role-card {
+        width: 100%;
+      }
+
+      /* Enhanced Responsive Breakpoints */
+      @media (min-width: 1400px) {
+        .role-selection-container {
+          max-width: 1400px;
+          padding: 70px 60px;
+        }
+
+        .role-card {
+          padding: 50px 40px;
+        }
+
+        .role-features {
+          min-height: 220px;
+        }
+      }
+
+      @media (max-width: 1200px) {
+        .role-selection-container {
+          padding: 45px 35px;
+        }
+
+        .role-features {
+          min-height: 190px;
+        }
+      }
+
+      @media (max-width: 992px) {
+        .role-selection-container {
+          padding: 40px 30px;
+          margin: 20px;
+          border-radius: 35px;
+        }
+
+        .role-features {
+          min-height: 180px;
+        }
+
+        .role-card {
+          padding: 35px 25px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .role-selection-container {
+          padding: 30px 20px;
+          border-radius: 30px;
+        }
+
+        .role-card {
+          padding: 30px 20px;
+        }
+
+        .role-features {
+          min-height: auto;
+          gap: 8px;
+        }
+
+        .selection-title {
+          margin: 30px 0 20px;
+        }
+
+        [class*="col-"] {
+          margin-bottom: 20px;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .role-selection-container {
+          padding: 25px 15px;
+          border-radius: 25px;
+        }
+
+        .role-card {
+          padding: 25px 15px;
+        }
+
+        .role-description {
+          min-height: auto;
+          margin-bottom: 15px;
+        }
+
+        .role-features {
+          gap: 8px;
+          padding: 0 5px;
+          margin-bottom: 20px;
+        }
+
+        .btn-role {
+          padding: 10px;
+        }
+
+        .back-link {
+          margin-top: 20px;
+        }
+
+        .selection-title {
+          margin: 25px 0 15px;
+        }
+
+        .logo-large {
+          margin-bottom: 20px;
+        }
+      }
+
+      @media (max-width: 380px) {
+        .role-selection-container {
+          padding: 20px 12px;
+        }
+
+        .role-card {
+          padding: 20px 12px;
+        }
+
+        .role-features span {
+          font-size: 0.7rem;
+        }
+
+        .role-features i {
+          width: 16px;
+          font-size: 0.75rem;
+        }
+
+        .btn-role {
+          font-size: 0.7rem;
+          padding: 8px;
+        }
+      }
+
+      /* Touch Device Optimizations */
+      @media (hover: none) and (pointer: coarse) {
+        .role-card:hover {
+          transform: none;
+        }
+
+        .btn-role:active {
+          transform: scale(0.98);
+        }
+
+        .role-card:active {
+          transform: scale(0.99);
+        }
+      }
+
+      /* Landscape Mode Optimization */
+      @media (max-width: 900px) and (orientation: landscape) {
+        .content-wrapper {
+          padding: 30px 20px;
+        }
+
+        .role-selection-container {
+          padding: 25px 20px;
+        }
+
+        .role-card {
+          padding: 20px 15px;
+        }
+
+        .role-features {
+          min-height: auto;
+        }
+
+        .role-icon {
+          font-size: 2.5rem;
+          margin-bottom: 10px;
+        }
+
+        .role-card h3 {
+          font-size: 1.2rem;
+          margin-bottom: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Video Background -->
+    <div class="video-container">
+      <video autoplay muted loop playsinline preload="metadata" id="bg-video">
+        <source src="../../assets/videos/main-bg.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay"></div>
+    </div>
+
+    <!-- Particle Canvas for Three.js -->
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="content-wrapper">
+      <div class="role-selection-container fade-in-up">
+        <!-- Logo Section -->
+        <div class="logo-large">
+          <i class="fas fa-infinity"></i>
+          <h1>OtakuVerse</h1>
+          <p class="tagline">Where Knowledge Meets Infinity</p>
+        </div>
+
+        <!-- Selection Title -->
+        <div class="selection-title">
+          <h3><i class="fas fa-user-astronaut"></i> Choose Your Path</h3>
+          <p>Select how you want to experience OtakuVerse</p>
+        </div>
+
+        <!-- Role Cards -->
+        <div class="row g-4">
+          <!-- User Card - Balanced Content -->
+          <div class="col-12 col-md-6">
+            <div
+              class="role-card user-card"
+              onclick="window.location.href = 'login.html'"
+            >
+              <div class="role-icon">
+                <i class="fas fa-user-graduate"></i>
+              </div>
+              <h3>Student / Learner</h3>
+              <div class="role-description">
+                Access the complete knowledge hub and explore unlimited learning
+                resources
+              </div>
+              <div class="role-features">
+                <span
+                  ><i class="fas fa-check-circle"></i> Access All Study
+                  Materials</span
+                >
+                <span
+                  ><i class="fas fa-check-circle"></i> Download Notes &
+                  Resources</span
+                >
+                <span
+                  ><i class="fas fa-check-circle"></i> Personal Learning
+                  Library</span
+                >
+                <span
+                  ><i class="fas fa-check-circle"></i> Track Your Progress</span
+                >
+                <span
+                  ><i class="fas fa-check-circle"></i> Bookmark Favorite
+                  Content</span
+                >
+              </div>
+              <button class="btn-role">
+                Continue as Learner <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Admin Card - Balanced Content (Same length as User) -->
+          <div class="col-12 col-md-6">
+            <div
+              class="role-card admin-card"
+              onclick="window.location.href = 'admin-login.html'"
+            >
+              <div class="role-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <h3>Administrator</h3>
+              <div class="role-description">
+                Manage platform content, users, and oversee the OtakuVerse
+                ecosystem
+              </div>
+              <div class="role-features">
+                <span
+                  ><i class="fas fa-check-circle"></i> Full Content
+                  Management</span
+                >
+                <span
+                  ><i class="fas fa-check-circle"></i> Upload & Manage
+                  Notes</span
+                >
+                <span
+                  ><i class="fas fa-check-circle"></i> User Analytics
+                  Dashboard</span
+                >
+                <span
+                  ><i class="fas fa-check-circle"></i> System Controls &
+                  Settings</span
+                >
+                <span
+                  ><i class="fas fa-check-circle"></i> User Access Control</span
+                >
+              </div>
+              <button class="btn-role">
+                Continue as Admin <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Back Link -->
+        <div class="text-center mt-4">
+          <a href="../../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Home
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Three.js Particle System
+      const canvas = document.getElementById("particle-canvas");
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000,
+      );
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+
+      // Create gradient particle colors (purple to pink)
+      const particleCount = 800;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 2000;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 1000;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 500;
+
+        // Purple to pink gradient colors
+        const colorChoice = Math.random();
+        if (colorChoice < 0.5) {
+          colors[i * 3] = 0.72; // R - Purple
+          colors[i * 3 + 1] = 0.3; // G
+          colors[i * 3 + 2] = 1.0; // B
+        } else {
+          colors[i * 3] = 1.0; // R - Pink
+          colors[i * 3 + 1] = 0.42; // G
+          colors[i * 3 + 2] = 0.62; // B
+        }
+      }
+
+      geometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(positions, 3),
+      );
+      geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+      const particleMaterial = new THREE.PointsMaterial({
+        size: 0.7,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.35,
+        blending: THREE.AdditiveBlending,
+      });
+
+      const particles = new THREE.Points(geometry, particleMaterial);
+      scene.add(particles);
+
+      camera.position.z = 500;
+
+      // Mouse interaction for particle movement
+      let mouseX = 0;
+      let mouseY = 0;
+
+      document.addEventListener("mousemove", (event) => {
+        mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+      });
+
+      // Animation
+      function animateParticles() {
+        requestAnimationFrame(animateParticles);
+
+        particles.rotation.y += 0.0004;
+        particles.rotation.x += 0.0003;
+
+        // Subtle mouse influence
+        particles.rotation.x += mouseY * 0.0004;
+        particles.rotation.y += mouseX * 0.0004;
+
+        renderer.render(scene, camera);
+      }
+
+      animateParticles();
+
+      // Handle resize
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Video background fallback
+      const video = document.getElementById("bg-video");
+      if (video) {
+        video.play().catch((e) => {
+          console.log("Video autoplay failed:", e);
+          document.querySelector(".video-overlay").style.background =
+            "linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9))";
+        });
+      }
+
+      // Enhanced particle effect on role cards
+      document.querySelectorAll(".role-card").forEach((card) => {
+        card.addEventListener("mouseenter", (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          // Create multiple particles for better effect
+          for (let i = 0; i < 8; i++) {
+            const particle = document.createElement("div");
+            const size = Math.random() * 8 + 4;
+            const isAdminCard = card.classList.contains("admin-card");
+            particle.style.cssText = `
+                                position: absolute;
+                                width: ${size}px;
+                                height: ${size}px;
+                                background: radial-gradient(circle, ${isAdminCard ? "#b84cff" : "#00d4ff"}, ${isAdminCard ? "#ff6b9d" : "transparent"});
+                                border-radius: 50%;
+                                left: ${x + (Math.random() - 0.5) * 40}px;
+                                top: ${y + (Math.random() - 0.5) * 40}px;
+                                pointer-events: none;
+                                opacity: 0.8;
+                                animation: ripple 1s ease-out forwards;
+                            `;
+            card.style.position = "relative";
+            card.style.overflow = "hidden";
+            card.appendChild(particle);
+            setTimeout(() => particle.remove(), 1000);
+          }
+        });
+      });
+
+      // Add ripple animation style
+      const style = document.createElement("style");
+      style.textContent = `
+                    @keyframes ripple {
+                        0% {
+                            transform: scale(0);
+                            opacity: 0.8;
+                        }
+                        100% {
+                            transform: scale(50);
+                            opacity: 0;
+                        }
+                    }
+                `;
+      document.head.appendChild(style);
+
+      // Anime.js animations
+      if (typeof anime !== "undefined") {
+        // Staggered fade in animation for cards
+        anime({
+          targets: ".role-card",
+          translateY: [50, 0],
+          opacity: [0, 1],
+          duration: 800,
+          delay: anime.stagger(150),
+          easing: "easeOutElastic(1, .6)",
+        });
+
+        // Logo animation
+        anime({
+          targets: ".logo-large",
+          scale: [0.8, 1],
+          opacity: [0, 1],
+          duration: 1000,
+          easing: "easeOutCubic",
+        });
+
+        // Title animation
+        anime({
+          targets: ".selection-title",
+          translateY: [30, 0],
+          opacity: [0, 1],
+          duration: 800,
+          delay: 300,
+          easing: "easeOutCubic",
+        });
+
+        // Back link animation
+        anime({
+          targets: ".back-link",
+          opacity: [0, 1],
+          duration: 600,
+          delay: 800,
+          easing: "linear",
+        });
+      }
+
+      // Add floating animation to icons
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("float-animation");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll(".role-icon").forEach((icon) => {
+        observer.observe(icon);
+      });
+    </script>
+    <script src="/js/title-manager.js"></script>
+  </body>
+</html>

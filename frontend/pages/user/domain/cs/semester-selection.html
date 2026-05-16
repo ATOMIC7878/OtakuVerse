@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>OtakuVerse | CS - Select Semester</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <style>
+      :root {
+        --primary-neon: #b84cff;
+        --secondary-neon: #ff6b9d;
+        --theory-color: #b84cff;
+        --practical-color: #ff6b9d;
+        --glass-bg: rgba(0, 0, 0, 0.45);
+        --primary-glow: rgba(184, 76, 255, 0.3);
+        --accent-blue: #00d4ff;
+        --tagline-silver: #e0e0e0;
+        --tagline-violet: #9d50bb;
+        --glass-border: rgba(255, 255, 255, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Space Grotesk", sans-serif;
+        background: #02020a;
+        color: #ffffff;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* --- Cinematic Background Engine --- */
+      .video-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -3;
+      }
+      #bg-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: brightness(0.4) saturate(1.2);
+      }
+      .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          circle at 50% 50%,
+          transparent 10%,
+          rgba(2, 2, 12, 0.85) 100%
+        );
+        z-index: -1;
+      }
+
+      /* --- Synchronized HUD Navbar --- */
+      .navbar {
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(25px) saturate(160%);
+        -webkit-backdrop-filter: blur(25px) saturate(160%);
+        border-bottom: 1px solid rgba(184, 76, 255, 0.2);
+        padding: 0.8rem 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .brand-group {
+        display: flex;
+        flex-direction: column;
+        padding-left: 5px;
+        min-width: 0; /* Protects grid flow on tight viewports */
+      }
+
+      .navbar-brand,
+      .navbar-brand:hover,
+      .navbar-brand:focus,
+      .navbar-brand:active {
+        font-family: "Orbitron", sans-serif;
+        font-weight: 900;
+        font-size: clamp(
+          1.1rem,
+          2.5vw,
+          1.4rem
+        ); /* Responsive fluid header font scaling */
+        background: linear-gradient(
+          135deg,
+          var(--primary-neon),
+          var(--secondary-neon)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent !important;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: 2px;
+        line-height: 1;
+        transition: opacity 0.3s ease;
+        white-space: nowrap;
+      }
+
+      .navbar-brand:hover {
+        opacity: 0.85;
+        filter: drop-shadow(0 0 8px var(--primary-glow));
+      }
+
+      .navbar-brand i {
+        color: var(--primary-neon);
+        -webkit-text-fill-color: initial;
+        background: linear-gradient(
+          135deg,
+          var(--primary-neon),
+          var(--secondary-neon)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+      }
+
+      .navbar-tagline {
+        font-family: "Orbitron", sans-serif;
+        font-size: clamp(
+          0.45rem,
+          1.2vw,
+          0.55rem
+        ); /* Adaptive sub-branding compression metrics */
+        letter-spacing: clamp(1.5px, 0.8vw, 3.5px);
+        background: linear-gradient(
+          90deg,
+          var(--tagline-silver),
+          var(--tagline-violet)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-top: 5px;
+        filter: drop-shadow(0 0 5px rgba(157, 80, 187, 0.4));
+        white-space: nowrap;
+      }
+
+      .back-link {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        font-family: "Orbitron", sans-serif;
+        font-size: clamp(0.65rem, 1.5vw, 0.75rem);
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 8px clamp(10px, 2vw, 18px); /* Adaptive block padding bounds */
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        white-space: nowrap;
+      }
+
+      .back-link:hover {
+        color: var(--primary-neon);
+        opacity: 1;
+        transform: translateX(-5px);
+        border-color: var(--primary-neon);
+        box-shadow: 0 0 15px var(--primary-glow);
+      }
+
+      main {
+        margin-top: clamp(
+          100px,
+          12vw,
+          130px
+        ); /* Responsive top container spacing matrix offsets */
+        padding-bottom: 50px;
+      }
+
+      /* --- Section Title Shimmer --- */
+      .section-title {
+        font-family: "Orbitron", sans-serif;
+        font-weight: 900;
+        font-size: clamp(1.5rem, 4vw, 2.2rem);
+        text-align: center;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(90deg, #fff, var(--primary-neon), #fff);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: titleShimmer 5s linear infinite;
+        letter-spacing: 1px;
+      }
+      @keyframes titleShimmer {
+        to {
+          background-position: 200% center;
+        }
+      }
+
+      /* --- Enhanced Semester Cards --- */
+      .semester-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        width: 100%;
+      }
+
+      .semester-card {
+        background: rgba(5, 5, 15, 0.4);
+        backdrop-filter: blur(20px) brightness(1.1);
+        -webkit-backdrop-filter: blur(20px) brightness(1.1);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 1.5rem clamp(1.2rem, 4vw, 2.5rem); /* Proportional internal text spacing margins */
+        margin-bottom: 1.2rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 15px; /* Box isolation margin gaps protection */
+      }
+
+      .semester-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          transparent 45%,
+          rgba(255, 255, 255, 0.05) 50%,
+          transparent 55%
+        );
+        background-size: 250% 250%;
+        background-position: var(--pos-x, 50%) var(--pos-y, 50%);
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .semester-card:hover {
+        transform: translateX(15px) scale(1.01);
+        background: rgba(20, 10, 35, 0.5);
+        border-color: var(--primary-neon);
+        box-shadow:
+          0 15px 40px rgba(0, 0, 0, 0.6),
+          0 0 20px rgba(184, 76, 255, 0.15);
+      }
+
+      .semester-number {
+        font-family: "Orbitron", sans-serif;
+        font-size: clamp(
+          1.4rem,
+          4vw,
+          2rem
+        ); /* Dynamic scale down parameters for narrow boundaries */
+        font-weight: 900;
+        color: #fff;
+        text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        min-width: clamp(
+          85px,
+          15vw,
+          110px
+        ); /* Proportional base widths sequence metrics */
+        transition: 0.4s;
+        flex-shrink: 0;
+      }
+
+      .semester-card:hover .semester-number {
+        color: var(--primary-neon);
+        text-shadow: 0 0 20px var(--primary-neon);
+      }
+
+      /* --- FIXED DESCRIPTION ALIGNMENT --- */
+      .semester-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 5px;
+        min-width: 0; /* Prevents long non-breaking nested properties from spilling layout boundaries */
+      }
+
+      .semester-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: clamp(
+          0.95rem,
+          2vw,
+          1.1rem
+        ); /* Proportional subhead constraints setup */
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+        letter-spacing: 1px;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .semester-subjects {
+        font-size: clamp(0.75rem, 1.5vw, 0.8rem);
+        color: rgba(255, 255, 255, 0.5);
+        font-weight: 400;
+        line-height: 1.6;
+        letter-spacing: 0.5px;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .semester-icon {
+        font-size: 1.1rem;
+        color: var(--primary-neon);
+        opacity: 0.3;
+        transition: 0.4s;
+        margin-left: 10px;
+        flex-shrink: 0;
+      }
+
+      .semester-card:hover .semester-icon {
+        opacity: 1;
+        transform: translateX(8px);
+      }
+
+      .info-box {
+        background: rgba(184, 76, 255, 0.05);
+        border: 1px solid rgba(184, 76, 255, 0.2);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-top: 3rem;
+        text-align: center;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        position: relative;
+        font-size: clamp(0.8rem, 2vw, 0.9rem);
+        color: rgba(255, 255, 255, 0.8);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Responsive Display Modifications Matrix */
+      @media (max-width: 768px) {
+        .navbar-tagline {
+          display: none;
+        }
+        .semester-card:hover {
+          transform: translateY(
+            -4px
+          ); /* Vertical layout path transition adjustment properties for mobile */
+        }
+        .semester-card:hover .semester-icon {
+          transform: translateX(4px);
+        }
+      }
+
+      @media (max-width: 576px) {
+        .semester-card {
+          padding: 1.5rem 1.2rem;
+          flex-direction: column;
+          text-align: center;
+          gap: 12px;
+        }
+        .semester-number {
+          min-width: unset;
+          font-size: 1.5rem;
+          text-align: center;
+        }
+        .semester-info {
+          padding: 0;
+          width: 100%;
+        }
+        .semester-title,
+        .semester-subjects {
+          white-space: normal; /* Enables uniform multiple lines wrap safely on low display profiles */
+          text-overflow: clip;
+          overflow: visible;
+        }
+        .semester-icon {
+          display: none; /* Destroys icon layout pollution footprint across tight structural viewports */
+        }
+        .info-box {
+          flex-direction: column;
+          gap: 8px;
+        }
+      }
+
+      /* Ultra-wide Screen Safeguard Boundaries */
+      @media (min-width: 1800px) {
+        .semester-container {
+          max-width: 850px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="video-container">
+      <video autoplay muted loop playsinline id="bg-video">
+        <source src="/assets/videos/CS.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay"></div>
+    </div>
+
+    <nav class="navbar">
+      <div class="container d-flex justify-content-between align-items-center">
+        <div class="brand-group">
+          <a class="navbar-brand" href="../../../user/home.html">
+            <i class="fas fa-infinity me-2"></i>OTAKUVERSE
+          </a>
+          <span class="navbar-tagline">Where Knowledge Meets Infinity</span>
+        </div>
+        <a href="../../../user/home.html" class="back-link">
+          <i class="fas fa-th-large me-2"></i> DASHBOARD
+        </a>
+      </div>
+    </nav>
+
+    <main>
+      <div class="semester-container">
+        <div class="text-center mb-5">
+          <h2 class="section-title">COMPUTER SCIENCE</h2>
+          <p
+            class="small opacity-50"
+            style="
+              letter-spacing: 4px;
+              font-family: &quot;Orbitron&quot;;
+              color: var(--secondary-neon);
+            "
+          >
+            GATEWAY INITIALIZED
+          </p>
+        </div>
+
+        <!-- Semester 1 -->
+        <div
+          class="semester-card"
+          onclick="window.location.href = 'sem1-notes.html'"
+        >
+          <div class="semester-number">SEM 01</div>
+          <div class="semester-info">
+            <div class="semester-title">Programming Fundamentals</div>
+            <div class="semester-subjects">Python | R | C++</div>
+          </div>
+          <div class="semester-icon"><i class="fas fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Semester 2 -->
+        <div
+          class="semester-card"
+          onclick="window.location.href = 'sem2-notes.html'"
+        >
+          <div class="semester-number">SEM 02</div>
+          <div class="semester-info">
+            <div class="semester-title">Data & Systems</div>
+            <div class="semester-subjects">Big Data | DBMS | Linux OS</div>
+          </div>
+          <div class="semester-icon"><i class="fas fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Semester 3 -->
+        <div
+          class="semester-card"
+          onclick="window.location.href = 'sem3-notes.html'"
+        >
+          <div class="semester-number">SEM 03</div>
+          <div class="semester-info">
+            <div class="semester-title">Advanced Development</div>
+            <div class="semester-subjects">
+              Java | DSA | Data Mining | Web Dev
+            </div>
+          </div>
+          <div class="semester-icon"><i class="fas fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Semester 4 -->
+        <div
+          class="semester-card"
+          onclick="window.location.href = 'sem4-notes.html'"
+        >
+          <div class="semester-number">SEM 04</div>
+          <div class="semester-info">
+            <div class="semester-title">Networks & Engineering</div>
+            <div class="semester-subjects">
+              CN & IoT | Software Engineering | Big Data | Android | Green
+              Tech-2
+            </div>
+          </div>
+          <div class="semester-icon">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+
+        <!-- Semester 5 -->
+        <div
+          class="semester-card"
+          onclick="window.location.href = 'sem5-notes.html'"
+        >
+          <div class="semester-number">SEM 05</div>
+          <div class="semester-info">
+            <div class="semester-title">Theory & Design</div>
+            <div class="semester-subjects">
+              Theory of Computation | Figma | AI
+            </div>
+          </div>
+          <div class="semester-icon"><i class="fas fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Semester 6 -->
+        <div
+          class="semester-card"
+          onclick="window.location.href = 'sem6-notes.html'"
+        >
+          <div class="semester-number">SEM 06</div>
+          <div class="semester-info">
+            <div class="semester-title">Specialized Systems</div>
+            <div class="semester-subjects">Compiler Design | MongoDB</div>
+          </div>
+          <div class="semester-icon"><i class="fas fa-chevron-right"></i></div>
+        </div>
+
+        <div class="info-box">
+          <i
+            class="fas fa-atom fa-spin me-2"
+            style="color: var(--primary-neon)"
+          ></i>
+          <span
+            >Select a semester to access <strong>Theory Notes</strong> and
+            <strong>Practical Codes</strong> for neural-link
+            synchronization.</span
+          >
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // Holofoil Hover Effect Logic
+      document.querySelectorAll(".semester-card").forEach((card) => {
+        card.addEventListener("mousemove", (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+          card.style.setProperty("--pos-x", `${x}%`);
+          card.style.setProperty("--pos-y", `${y}%`);
+        });
+      });
+
+      function selectSemester(semester) {
+        localStorage.setItem("selectedSemester", semester);
+        window.location.href = "semester-notes.html";
+      }
+
+      // Initial Reveal Animation
+      anime({
+        targets: ".semester-card",
+        translateX: [-30, 0],
+        opacity: [0, 1],
+        delay: anime.stagger(80),
+        duration: 1000,
+        easing: "easeOutQuart",
+      });
+    </script>
+    <script src="/js/title-manager.js"></script>
+  </body>
+</html>

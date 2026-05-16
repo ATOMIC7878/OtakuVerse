@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>OtakuVerse | Admin Login</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Space Grotesk", "Inter", sans-serif;
+        overflow-x: hidden;
+        color: #ffffff;
+        min-height: 100vh;
+      }
+      .video-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -2;
+      }
+      #bg-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          circle at 50% 50%,
+          transparent 10%,
+          rgba(2, 2, 12, 0.85) 100%
+        );
+        z-index: 1;
+      }
+      #particle-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .content-wrapper {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(15px, 4vw, 40px) clamp(10px, 3vw, 20px);
+        width: 100%;
+      }
+
+      .auth-container {
+        max-width: 520px;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 40px;
+        padding: 55px clamp(20px, 5vw, 45px);
+        transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+        position: relative;
+      }
+      .auth-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          transparent,
+          rgba(255, 71, 87, 0.03),
+          transparent
+        );
+        pointer-events: none;
+        border-radius: 40px;
+      }
+      .auth-container:hover {
+        border-color: rgba(255, 71, 87, 0.6);
+        box-shadow:
+          0 35px 70px rgba(0, 0, 0, 0.8),
+          0 0 30px rgba(255, 71, 87, 0.15);
+        transform: translateY(-6px);
+      }
+      .auth-logo {
+        text-align: center;
+        margin-bottom: 40px;
+        width: 100%;
+      }
+      .auth-logo i.fa-shield-alt {
+        font-size: clamp(3.5rem, 8vw, 5rem);
+        background: linear-gradient(135deg, #ff4757, #ff6b9d);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: pulseGlow 2s ease-in-out infinite;
+        filter: drop-shadow(0 0 15px rgba(255, 71, 87, 0.4));
+        display: inline-block;
+      }
+      .auth-logo h2 {
+        font-size: clamp(1.8rem, 4vw, 2.2rem);
+        font-weight: 800;
+        font-family: "Orbitron", monospace;
+        margin-top: 20px;
+        background: linear-gradient(135deg, #ffffff, #ff4757);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        letter-spacing: -0.5px;
+      }
+      .auth-logo p {
+        color: rgba(255, 255, 255, 0.95);
+        margin-top: 14px;
+        font-size: clamp(0.75rem, 1.8vw, 0.85rem);
+        font-family: "Orbitron", sans-serif;
+        font-weight: 500;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+      }
+      .admin-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(10, 10, 20, 0.6);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 107, 157, 0.8);
+        box-shadow:
+          0 0 15px rgba(255, 107, 157, 0.2),
+          inset 0 0 10px rgba(255, 107, 157, 0.1);
+        padding: 6px 18px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-family: "Orbitron", sans-serif;
+        margin-top: 20px;
+        color: #fff;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .admin-badge i {
+        color: #ff6b9d;
+        filter: drop-shadow(0 0 5px #ff6b9d);
+      }
+      .form-group {
+        margin-bottom: 28px;
+        width: 100%;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 600;
+        font-size: 0.85rem;
+        font-family: "Orbitron", sans-serif;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+      .form-group label i {
+        margin-right: 6px;
+        color: #ff4757;
+      }
+      .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+      .input-icon {
+        position: absolute;
+        left: 18px;
+        color: #ff4757;
+        font-size: 1rem;
+        z-index: 2;
+        transition: color 0.3s ease;
+      }
+      .form-control {
+        width: 100%;
+        padding: 15px 18px 15px 48px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      }
+      .password-input {
+        padding-right: 50px;
+      }
+      .form-control:focus {
+        outline: none;
+        border-color: #ff4757;
+        box-shadow: 0 0 20px rgba(255, 71, 87, 0.35);
+        background: rgba(0, 0, 0, 0.5);
+      }
+      .input-wrapper:focus-within .input-icon {
+        color: #ff6b9d;
+        filter: drop-shadow(0 0 5px #ff6b9d);
+      }
+      .password-toggle {
+        position: absolute;
+        right: 18px;
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.4);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 2;
+        font-size: 1.1rem;
+      }
+      .password-toggle:hover {
+        color: #ff4757;
+        transform: scale(1.15);
+      }
+      .btn-auth {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #ff4757, #ff6b9d);
+        border: none;
+        border-radius: 50px;
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-top: 30px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        font-family: "Orbitron", monospace;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+      .btn-auth:hover:not(:disabled) {
+        transform: translateY(-4px) scale(1.01);
+        box-shadow: 0 12px 30px rgba(255, 71, 87, 0.4);
+      }
+      .btn-auth:active:not(:disabled) {
+        transform: translateY(-1px);
+      }
+      .btn-auth:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .auth-link {
+        text-align: center;
+        margin-top: 32px;
+        color: #ffffff;
+        font-weight: 500;
+        font-size: clamp(0.8rem, 1.8vw, 0.85rem);
+        padding: 14px;
+        background: rgba(255, 71, 87, 0.04);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 71, 87, 0.4);
+        box-shadow: 0 0 12px rgba(255, 71, 87, 0.1);
+        letter-spacing: 0.3px;
+        width: 100%;
+      }
+      .auth-link i {
+        color: #ff4757;
+        font-size: 0.95rem;
+        margin-right: 4px;
+        filter: drop-shadow(0 0 6px #ff4757);
+      }
+      .back-link {
+        display: inline-block;
+        margin-top: 25px;
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        padding: 8px 20px;
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        white-space: nowrap;
+      }
+      .back-link:hover {
+        color: #ff4757;
+        transform: translateX(-5px);
+        background: rgba(255, 71, 87, 0.1);
+        border-color: #ff4757;
+        box-shadow: 0 0 15px rgba(255, 71, 87, 0.2);
+      }
+      @media (max-width: 576px) {
+        .auth-container {
+          padding: 35px 25px;
+          margin: 15px;
+          border-radius: 30px;
+        }
+        .form-control {
+          padding: 14px 40px 14px 44px;
+          font-size: 0.95rem;
+        }
+        .input-icon {
+          left: 15px;
+        }
+        .btn-auth {
+          padding: 14px;
+          font-size: 0.9rem;
+        }
+      }
+      @media (min-width: 1800px) {
+        .auth-container {
+          max-width: 540px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="video-container">
+      <video autoplay muted loop playsinline preload="metadata" id="bg-video">
+        <source src="../../assets/videos/main-bg.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay"></div>
+    </div>
+
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="content-wrapper">
+      <div class="auth-container fade-in-up">
+        <div class="auth-logo">
+          <i class="fas fa-shield-alt"></i>
+          <h2>Admin Portal</h2>
+          <p>Secure access for administrators only</p>
+          <div class="admin-badge">
+            <i class="fas fa-lock"></i> Restricted Access
+          </div>
+        </div>
+
+        <form id="adminLoginForm">
+          <div class="form-group">
+            <label for="email"
+              ><i class="fas fa-envelope"></i> Admin Email</label
+            >
+            <div class="input-wrapper">
+              <i class="fas fa-envelope input-icon"></i>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                placeholder="Enter your admin email"
+                required
+              />
+            </div>
+            <div class="invalid-feedback" id="emailError"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="password"
+              ><i class="fas fa-key"></i> Admin Password</label
+            >
+            <div class="input-wrapper">
+              <i class="fas fa-lock input-icon"></i>
+              <input
+                type="password"
+                class="form-control password-input"
+                id="password"
+                placeholder="Enter your admin password"
+                required
+              />
+              <button type="button" class="password-toggle" id="togglePassword">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback" id="passwordError"></div>
+          </div>
+
+          <button type="submit" class="btn-auth" id="loginBtn">
+            <i class="fas fa-sign-in-alt"></i> Access Admin Panel
+          </button>
+        </form>
+
+        <div class="auth-link">
+          <i class="fas fa-info-circle"></i> Contact system administrator for
+          credentials
+        </div>
+
+        <div class="text-center">
+          <a href="select-role.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Role Selection
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const API_BASE = "http://localhost:5000/api/v1";
+
+      // Clear any existing admin session on login page load
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("adminData");
+      localStorage.removeItem("userRole");
+
+      // Three.js Particle System
+      const canvas = document.getElementById("particle-canvas");
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000,
+      );
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+
+      const particleCount = 800;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 2000;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 1000;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 500;
+        const colorChoice = Math.random();
+        if (colorChoice < 0.5) {
+          colors[i * 3] = 1.0;
+          colors[i * 3 + 1] = 0.27;
+          colors[i * 3 + 2] = 0.34;
+        } else {
+          colors[i * 3] = 1.0;
+          colors[i * 3 + 1] = 0.42;
+          colors[i * 3 + 2] = 0.62;
+        }
+      }
+
+      geometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(positions, 3),
+      );
+      geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+      const particleMaterial = new THREE.PointsMaterial({
+        size: 0.7,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.35,
+        blending: THREE.AdditiveBlending,
+      });
+
+      const particles = new THREE.Points(geometry, particleMaterial);
+      scene.add(particles);
+      camera.position.z = 500;
+
+      let mouseX = 0,
+        mouseY = 0;
+      document.addEventListener("mousemove", (event) => {
+        mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+      });
+
+      function animateParticles() {
+        requestAnimationFrame(animateParticles);
+        particles.rotation.y += 0.0004;
+        particles.rotation.x += 0.0003;
+        particles.rotation.x += mouseY * 0.0004;
+        particles.rotation.y += mouseX * 0.0004;
+        renderer.render(scene, camera);
+      }
+      animateParticles();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Video fallback
+      const video = document.getElementById("bg-video");
+      if (video) {
+        video.play().catch((e) => {
+          document.querySelector(".video-overlay").style.background =
+            "linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.95))";
+        });
+      }
+
+      // Password visibility toggle
+      const togglePassword = document.getElementById("togglePassword");
+      const passwordInput = document.getElementById("password");
+
+      togglePassword.addEventListener("click", function () {
+        const type =
+          passwordInput.getAttribute("type") === "password"
+            ? "text"
+            : "password";
+        passwordInput.setAttribute("type", type);
+        this.querySelector("i").classList.toggle("fa-eye");
+        this.querySelector("i").classList.toggle("fa-eye-slash");
+      });
+
+      // Form submission - UPDATED for separated database structure
+      // The backend route /api/v1/admin/login now queries the ADMIN collection
+      const loginForm = document.getElementById("adminLoginForm");
+      const loginBtn = document.getElementById("loginBtn");
+
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const password = passwordInput.value;
+
+        document.getElementById("emailError").textContent = "";
+        document.getElementById("passwordError").textContent = "";
+        document.getElementById("email").classList.remove("is-invalid");
+        passwordInput.classList.remove("is-invalid");
+
+        let hasError = false;
+
+        if (!email) {
+          document.getElementById("emailError").textContent =
+            "Email is required";
+          document.getElementById("email").classList.add("is-invalid");
+          hasError = true;
+        }
+
+        if (!password) {
+          document.getElementById("passwordError").textContent =
+            "Password is required";
+          passwordInput.classList.add("is-invalid");
+          hasError = true;
+        }
+
+        if (hasError) return;
+
+        loginBtn.disabled = true;
+        loginBtn.innerHTML =
+          '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+
+        try {
+          // UPDATED: Endpoint correctly targets admin collection via backend
+          const response = await fetch(`${API_BASE}/admin/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Store admin data from ADMIN collection
+            localStorage.setItem("adminToken", data.data.token);
+            localStorage.setItem("adminData", JSON.stringify(data.data.admin));
+            localStorage.setItem("userRole", data.data.admin.role);
+
+            showNotification(
+              "Admin access granted! Redirecting to dashboard...",
+              "success",
+            );
+
+            setTimeout(() => {
+              window.location.href = "../admin/admin-dashboard.html";
+            }, 500);
+          } else {
+            // Show error without exposing sensitive info
+            document.getElementById("passwordError").textContent =
+              data.message || "Invalid email or password";
+            passwordInput.classList.add("is-invalid");
+            loginBtn.disabled = false;
+            loginBtn.innerHTML =
+              '<i class="fas fa-sign-in-alt"></i> Access Admin Panel';
+          }
+        } catch (error) {
+          console.error("Login error:", error);
+          showNotification(
+            "Login failed. Please check if backend server is running on port 5000",
+            "error",
+          );
+          loginBtn.disabled = false;
+          loginBtn.innerHTML =
+            '<i class="fas fa-sign-in-alt"></i> Access Admin Panel';
+        }
+      });
+
+      function showNotification(message, type) {
+        const notification = document.createElement("div");
+        notification.innerHTML = `<i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"}"></i> ${message}`;
+        notification.style.cssText = `
+                position: fixed;
+                top: 30px;
+                right: 30px;
+                background: ${type === "success" ? "linear-gradient(135deg, #05df8b, #00cc6a)" : "linear-gradient(135deg, #ff4757, #ff3355)"};
+                color: white;
+                padding: 14px 24px;
+                border-radius: 16px;
+                z-index: 10000;
+                cursor: pointer;
+                animation: fadeInUp 0.3s ease;
+                font-weight: 600;
+                font-size: 0.9rem;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                backdrop-filter: blur(10px);
+            `;
+        document.body.appendChild(notification);
+        setTimeout(() => {
+          notification.style.opacity = "0";
+          notification.style.transform = "translateX(100px)";
+          setTimeout(() => notification.remove(), 300);
+        }, 3000);
+        notification.onclick = () => notification.remove();
+      }
+
+      // Anime.js animation
+      if (typeof anime !== "undefined") {
+        anime({
+          targets: ".auth-container",
+          opacity: [0, 1],
+          scale: [0.92, 1],
+          duration: 800,
+          easing: "easeOutElastic(1, .6)",
+        });
+      }
+    </script>
+    <script src="/js/title-manager.js"></script>
+  </body>
+</html>

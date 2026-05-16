@@ -1,0 +1,87 @@
+/* Admin Dashboard Styles */
+.admin-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.admin-stats-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 25px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.admin-stats-card:hover {
+  transform: translateY(-5px);
+}
+
+.admin-stats-card h3 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: var(--primary-color);
+}
+
+.admin-stats-card i {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  font-size: 3rem;
+  opacity: 0.2;
+}
+
+.admin-stats-card p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* Admin Table Styles */
+.admin-table {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.admin-table th {
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--primary-color);
+  padding: 15px;
+  border: none;
+}
+
+.admin-table td {
+  padding: 12px 15px;
+  color: var(--text-secondary);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Admin Form Styles */
+.admin-form {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 25px;
+}
+
+.admin-form .form-control {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.admin-form .form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 10px rgba(108, 99, 255, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-stats-card h3 {
+    font-size: 1.8rem;
+  }
+
+  .admin-table {
+    font-size: 0.85rem;
+  }
+}

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="infinityGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#b84cff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff6b9d;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle (optional - transparent background) -->
+  <circle cx="50" cy="50" r="45" fill="none" stroke="url(#infinityGrad)" stroke-width="2"/>
+  
+  <!-- Infinity Symbol - Matching your website -->
+  <path d="M25,50 
+           C25,35 35,30 45,40 
+           L50,45 
+           L55,40 
+           C65,30 75,35 75,50 
+           C75,65 65,70 55,60 
+           L50,55 
+           L45,60 
+           C35,70 25,65 25,50 Z" 
+        fill="url(#infinityGrad)" 
+        stroke="url(#infinityGrad)" 
+        stroke-width="2"/>
+        
+  <!-- Alternative simpler infinity symbol -->
+  <text x="50" y="68" font-size="55" text-anchor="middle" fill="url(#infinityGrad)" font-family="Arial, sans-serif" font-weight="bold">∞</text>
+</svg>
