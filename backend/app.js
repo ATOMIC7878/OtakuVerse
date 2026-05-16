@@ -14,16 +14,20 @@ const errorMiddleware = require("./middleware/errorMiddleware");
 
 const app = express();
 
-// ===== FIXED CORS CONFIGURATION =====
-// Allow multiple origins
+// ===== UPDATED CORS CONFIGURATION FOR PRODUCTION =====
+// Get allowed origins from environment variable
+const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:5500";
+
+// Build allowed origins array
 const allowedOrigins = [
   "http://localhost:5500",
   "http://localhost:5501",
   "http://127.0.0.1:5500",
   "http://127.0.0.1:5501",
-  "http://localhost:62760",
-  "http://127.0.0.1:62760",
+  corsOrigin, // Your Netlify URL from environment variable
 ];
+
+console.log(`CORS allowed origins: ${allowedOrigins.join(", ")}`);
 
 app.use(
   cors({
@@ -31,12 +35,19 @@ app.use(
       // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.indexOf(origin) === -1) {
-        console.log(`Blocked CORS from origin: ${origin}`);
-        // For development, still allow but log
+      // Check if origin is allowed
+      if (allowedOrigins.indexOf(origin) !== -1 || origin === corsOrigin) {
         return callback(null, true);
       }
-      return callback(null, true);
+
+      // Also allow any origin in production if it matches the pattern
+      if (process.env.NODE_ENV === "production" && origin) {
+        console.log(`CORS allowed (production): ${origin}`);
+        return callback(null, true);
+      }
+
+      console.log(`Blocked CORS from origin: ${origin}`);
+      return callback(null, false);
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -100,6 +111,8 @@ app.get("/", (req, res) => {
     tagline: "Where Knowledge Meets Infinity",
     version: "1.0.0",
     status: "active",
+    environment: process.env.NODE_ENV,
+    cors_origin: corsOrigin,
   });
 });
 
